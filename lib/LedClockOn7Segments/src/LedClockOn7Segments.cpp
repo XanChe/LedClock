@@ -15,29 +15,61 @@ byte numbers[] = {
     0b01100110, // CHAR_C
   };
 
+void LedClockOn7Segments::tic(){
+    if((millis() - mil) >=500){
+        cronCounter++;
+        mil = millis();
+
+        
+    }
+
+}
+
+void LedClockOn7Segments::assignFastLED(CFastLED fLED){
+    CurFastLED = fLED;
+}
+
 
 void LedClockOn7Segments::setCurTime(byte hour, byte minutes, byte seconds){
     curentTime = hour * 3600 + minutes * 60 + seconds;
 }
 
-void LedClockOn7Segments::drowTime(ledEffects effect = DAYLY){
-    drowTime(curentTime / 3600, (curentTime % 3600) / 60, effect);
+void LedClockOn7Segments::clearDispley(){
+    for(byte i =0;i < NUM_LEDS; i++){
+        ledSource[i] = CRGB::Black;
+        ledEffects[i] = DAYLY;
+    }
+}
+void LedClockOn7Segments::drowTimeOnDispley(showingLedEffects effect){
+    drowTimeOnDispley(curentTime / 3600, (curentTime % 3600) / 60, effect);
 }
 
-void LedClockOn7Segments::drowTime(byte hour, byte minutes, ledEffects effect = DAYLY){
-    byte hl = hour / 10;
-    byte hr = hour % 10;
-    byte ml = minutes / 10;
-    byte mr = minutes % 10;    
+void LedClockOn7Segments::drowDotes(showingLedEffects effect){
+    for(byte i = SEGMENT_LED_COUNT*7*2; i < SEGMENT_LED_COUNT*7*2 +DOTES_LED_COUNT; i++){
+        ledSource[i] = clockColor;
+        ledEffects[i] = effect;
+    }
+}
+
+void LedClockOn7Segments::drowTimeOnDispley(byte hour, byte minutes, showingLedEffects effect){     
     
-    drowNumber(0, 8, effect);    
-    drowNumber(SEGMENT_LED_COUNT*7, 8, effect);
-     
-    drowNumber(SEGMENT_LED_COUNT*7*2+2, hr, effect); // +2 сдесь + 2 мигающие точки
-    drowNumber(SEGMENT_LED_COUNT*7*3+2, hl, effect);   
+    drowMinutes(minutes, state != MENU_MINUTES ? effect : BLINK);    
+    drowDotes(state == CUR_TIME ? BLINK : OFF);  
+    drowHour(hour, state != MENU_HOUR ? effect : BLINK);     
 }
 
-void LedClockOn7Segments::drowNumber(int startindex, byte number, ledEffects effect = DAYLY){    
+void LedClockOn7Segments::drowHour(byte hour, showingLedEffects effect){
+
+    drowNumber(SEGMENT_LED_COUNT*7*2+DOTES_LED_COUNT, hour % 10, effect); // +DOTES_LED_COUNT сдесь + DOTES_LED_COUNT мигающие точки
+    drowNumber(SEGMENT_LED_COUNT*7*3+DOTES_LED_COUNT, hour / 10, effect);
+}
+
+void LedClockOn7Segments::drowMinutes(byte minutes, showingLedEffects effect){
+    drowNumber(0, minutes % 10, effect);    
+    drowNumber(SEGMENT_LED_COUNT*7, minutes / 10, effect);
+}
+
+void LedClockOn7Segments::drowNumber(int startindex, byte number, showingLedEffects effect){    
     isDisplayModifyded = true; 
 
     CRGB segmentColor = CRGB::Black;
@@ -46,25 +78,54 @@ void LedClockOn7Segments::drowNumber(int startindex, byte number, ledEffects eff
         segmentColor = ((numbers[number] & 1 << i) == 1 << i) ? clockColor : CRGB::Black;
         for(int j = 0; j < SEGMENT_LED_COUNT; j++){
             ledSource[z + startindex] = segmentColor;
-            showEffects[z + startindex] = effect;//эффект показа, тут
+            ledEffects[z + startindex] = effect;//эффект показа, тут
             z++;
         }
   }
 }
 
-bool LedClockOn7Segments::render(CRGB displayLed[]){
-    if(!isDisplayModifyded) return false;
-    for(int i = 0; i < NUM_LEDS; i++){
-        displayLed[i] = applyEffectsToDisplayLedByIndex(i);
+void LedClockOn7Segments::regularRender(){
+    
+}
+
+void LedClockOn7Segments::cron(){
+    
+    
+}
+void LedClockOn7Segments::render(CRGB displayLed[]){
+    if(cronCounter % 2 == 0){
+        for(int i = 0; i < NUM_LEDS; i++){
+            displayLed[i] = applyEffectsToDisplayLedByIndex(i);
+        }
+        isDisplayModifyded = false;
+        CurFastLED.show();
     }
-    isDisplayModifyded = false;
-   
-    return true;
+    
 }
 
 CRGB LedClockOn7Segments::applyEffectsToDisplayLedByIndex(byte i){
-    if(showEffects[i] == DAYLY) return ledSource[i];
-    else return ledSource[i];
+    switch (ledEffects[i])
+    {
+    case DAYLY:
+        return ledSource[i];
+        break;
+    case OFF:
+        return  CRGB::Black;
+        break;
+    case BLINK:
+        if(cronCounter % 4 < 2) {
+            return ledSource[i];
+        }
+        else{
+            return CRGB::Black;
+        }
+        break;
+    
+    default:
+        return ledSource[i];
+        break;
+    }
+    
 }
 
 LedClockOn7Segments ledClock = LedClockOn7Segments();

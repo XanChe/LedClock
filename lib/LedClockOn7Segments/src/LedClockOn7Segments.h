@@ -6,7 +6,8 @@
 
 #define NUM_LEDS 86     
 #define DATA_PIN 8
-#define SEGMENT_LED_COUNT 3
+#define SEGMENT_LED_COUNT 1
+#define DOTES_LED_COUNT 2
 #define BLINK_MENU_FR 3// разз в две мигания точек
 #define COLOR_COUNT 256
 
@@ -21,7 +22,7 @@ enum clockStates {
     MENU,
 };
 
-enum ledEffects {
+enum showingLedEffects {
     DAYLY,
     NIGHTLY,
     BLINK,
@@ -42,29 +43,45 @@ class LedClockOn7Segments{
         int curentTime = 0;
         int tOut = -200;
         int tIn  = -200;
+        
+
+        unsigned long mil =0;
+
+        CFastLED CurFastLED;
 
         clockStates state = CUR_TIME;
 
         CRGB ledSource[NUM_LEDS];
-        ledEffects showEffects[NUM_LEDS];
+        showingLedEffects ledEffects[NUM_LEDS];
         CRGB clockColor = CRGB::Green;
 
+        
         bool isDisplayModifyded = 0;
 
-        void drowNumber(int startindex, byte number, ledEffects effect = DAYLY);
-        CRGB applyEffectsToDisplayLedByIndex(byte i);
-    public:
-        void tic();
-        void setCurTime(byte hour, byte minutes, byte seconds);
-        void drowTime(ledEffects effect = DAYLY);
-        void drowTime(byte hour, byte minutes, ledEffects effect = DAYLY);
+        void drowNumber(int startindex, byte number, showingLedEffects effect = DAYLY);
+        void drowHour(byte hour, showingLedEffects effect = DAYLY);
+        void drowMinute(byte minute, showingLedEffects effect = DAYLY);
         void drowDotes();
         void drowSign(int8_t t);
-        void drowTemperature(int8_t t);
+        CRGB applyEffectsToDisplayLedByIndex(byte i);
+        
+        void regularRender();
+    public:
+        unsigned long cronCounter = 0;
+        void cron();
+        void assignFastLED(CFastLED fLED);
+        void tic();
+        void setCurTime(byte hour, byte minutes, byte seconds);
+        void clearDispley();
+        void clearIcons();
+        void drowTimeOnDispley(showingLedEffects effect = DAYLY);
+        void drowTimeOnDispley(byte hour, byte minutes, showingLedEffects effect = DAYLY);
+        
+        void drowTemperatureOnDispley(int8_t t);
         void drowIcon(icons icon);
         void setStateTo(clockStates state);
 
-        bool render(CRGB displayLed[]);
+        void render(CRGB displayLed[]);
 
 
 };
