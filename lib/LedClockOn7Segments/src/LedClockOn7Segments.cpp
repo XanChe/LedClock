@@ -18,11 +18,16 @@ byte numbers[] = {
 void LedClockOn7Segments::tic(){
     if((millis() - mil) >=500){
         cronCounter++;
-        mil = millis();
-
-        
+        mil = millis();        
+    }
+    if(cronCounter % 120 == 0){
+       if(*timeUpdateCallbackFunction!=NULL)timeUpdateCallbackFunction(); 
     }
 
+}
+
+void LedClockOn7Segments::setTimeUpdateCallbackFunctionName(void (*func)()){
+    timeUpdateCallbackFunction = func;
 }
 
 void LedClockOn7Segments::assignFastLED(CFastLED fLED){
@@ -39,6 +44,29 @@ void LedClockOn7Segments::clearDispley(){
         ledSource[i] = CRGB::Black;
         ledEffects[i] = DAYLY;
     }
+}
+
+void LedClockOn7Segments::drowTemperatureOnDispley(int8_t temperature){
+    
+    int templ = temperature / 10;
+    int tempr = temperature % 10;
+    showingLedEffects effect = temperature >= 0 ? PLUS_ZERO : SUB_ZERO;
+    drowNumber(0, CHAR_UP_ZERO, effect);    
+    drowNumber(SEGMENT_LED_COUNT*7, CHAR_C, effect);
+    drowDotes(OFF) ;
+    drowNumber(SEGMENT_LED_COUNT*7*2+2, tempr, effect);
+    drowNumber(SEGMENT_LED_COUNT*7*3+2, templ, effect);   
+    /*if(temperature>0)DrowSign('+');
+    if(temperature<0)DrowSign('-');
+    FastLED.setBrightness(  brightness );
+    FastLED.show();*/
+      
+}
+void LedClockOn7Segments::drowSign(){
+    for(int i = SEGMENT_LED_COUNT*28+2; i < SEGMENT_LED_COUNT*28+2 + SEGMENT_LED_COUNT; i++){
+        ledSource[i] = subZeroColor;
+        ledEffects[i] = SUB_ZERO;
+  }
 }
 void LedClockOn7Segments::drowTimeOnDispley(showingLedEffects effect){
     drowTimeOnDispley(curentTime / 3600, (curentTime % 3600) / 60, effect);
