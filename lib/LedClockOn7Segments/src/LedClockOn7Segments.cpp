@@ -1,4 +1,5 @@
 #include <LedClockOn7Segments.h>
+#include <stdlib.h>
 
 byte numbers[] = {
     0b01110111, // 0    
@@ -20,13 +21,27 @@ void LedClockOn7Segments::tic(){
         cronCounter++;
         mil = millis();        
     }
-    if(cronCounter % 120 == 0){
+    if(millis() % 12000 == 0){
        if(*timeUpdateCallbackFunction!=NULL)timeUpdateCallbackFunction(); 
+    }
+
+    switch (state)
+    {
+    case CUR_TIME:
+        drowTimeOnDispley();
+        break;
+    case CUR_T_OUTDOOR:
+        drowTemperatureOnDispley(-35);
+        break;
+    
+    default:
+        drowTimeOnDispley();
+        break;
     }
 
 }
 
-void LedClockOn7Segments::setTimeUpdateCallbackFunctionName(void (*func)()){
+void LedClockOn7Segments::setTimeUpdateCallbackFunction(void (*func)()){
     timeUpdateCallbackFunction = func;
 }
 
@@ -36,47 +51,97 @@ void LedClockOn7Segments::assignFastLED(CFastLED fLED){
 
 
 void LedClockOn7Segments::setCurTime(byte hour, byte minutes, byte seconds){
-    curentTime = hour * 3600 + minutes * 60 + seconds;
+    curentTime = ((unsigned long)hour * 3600) + ((unsigned long)minutes * 60) + (unsigned long)seconds;
+        
 }
 
 void LedClockOn7Segments::clearDispley(){
     for(byte i =0;i < NUM_LEDS; i++){
-        ledSource[i] = CRGB::Black;
+        ledIsShowed[i] = false;
+        ledColors[i] = CRGB::Black;
         ledEffects[i] = DAYLY;
     }
 }
 
-void LedClockOn7Segments::drowTemperatureOnDispley(int8_t temperature){
+void LedClockOn7Segments::drowIcon(icons icon){
+    switch (icon)
+    {
+    case icons::INDOOR_T:
+        drowLedSegment(ledIcons, 6 , 4, CRGB::AliceBlue, DAYLY);        
+        break;
+    case icons::OUTDOOR_T:
+        drowLedSegment(ledIcons, 10 , 4, CRGB::AliceBlue, DAYLY);
+        break;
+    case icons::MAX_T:
+        drowLedSegment(ledIcons, 4 , 1, CRGB::AliceBlue, DAYLY);
+        break;
+    case icons::MIN_T:
+        drowLedSegment(ledIcons, 5 , 1, CRGB::AliceBlue, DAYLY);
+        break;
+    case icons::SWITCH_BUTTON:
+        drowLedSegment(ledIcons, 2 , 2, CRGB::AliceBlue, DAYLY);
+        break;
+    case icons::STAT_BUTTON:
+        drowLedSegment(ledIcons, 0 , 2, CRGB::AliceBlue, DAYLY);
+        break;
+    case icons::ALL:
+        drowLedSegment(ledIcons, 0 , 14, CRGB::AliceBlue, NIGHTLY);
+        break;
+    case icons::FADE_ALL:
+        drowLedSegment(ledIcons, 0 , 14, CRGB::Black, OFF);
+        break;
+    default:
+        drowLedSegment(ledIcons, 0 , 14, CRGB::Black, OFF);
+        break;
+    }
+}
+
+void LedClockOn7Segments::drowLedSegment(LedPixel ledArray[], byte start, byte count, CRGB color, showingLedEffects effect, bool isShowed){
+    for(byte i = start; i < start + count; i++){
+            ledArray[i].color = color;
+            ledArray[i].isShowed = isShowed;
+            ledArray[i].effect = effect;
+        }
+}
+
+
+
+void LedClockOn7Segments::drowTemperatureOnDispley(int temperature){
     
-    int templ = temperature / 10;
-    int tempr = temperature % 10;
+    int templ = abs(temperature) / 10;
+    int tempr = abs(temperature) % 10;    
+    
     showingLedEffects effect = temperature >= 0 ? PLUS_ZERO : SUB_ZERO;
-    drowNumber(0, CHAR_UP_ZERO, effect);    
-    drowNumber(SEGMENT_LED_COUNT*7, CHAR_C, effect);
+    
+    drowNumber(0, CHAR_C, effect);    
+    drowNumber(SEGMENT_LED_COUNT*7, CHAR_UP_ZERO, DAYLY);
     drowDotes(OFF) ;
-    drowNumber(SEGMENT_LED_COUNT*7*2+2, tempr, effect);
-    drowNumber(SEGMENT_LED_COUNT*7*3+2, templ, effect);   
-    /*if(temperature>0)DrowSign('+');
-    if(temperature<0)DrowSign('-');
-    FastLED.setBrightness(  brightness );
-    FastLED.show();*/
+    drowNumber(SEGMENT_LED_COUNT*7*2+DOTES_LED_COUNT, tempr, effect);
+    drowNumber(SEGMENT_LED_COUNT*7*3+DOTES_LED_COUNT, templ, effect);   
+    if(temperature<0)drowSign();   
       
 }
 void LedClockOn7Segments::drowSign(){
-    for(int i = SEGMENT_LED_COUNT*28+2; i < SEGMENT_LED_COUNT*28+2 + SEGMENT_LED_COUNT; i++){
-        ledSource[i] = subZeroColor;
+    
+    drowLedSegment(ledMain, SEGMENT_LED_COUNT*28+DOTES_LED_COUNT, 2, subZeroColor, SUB_ZERO);
+    /*for(int i = SEGMENT_LED_COUNT*28+DOTES_LED_COUNT; i < SEGMENT_LED_COUNT*28+DOTES_LED_COUNT + SEGMENT_LED_COUNT; i++){
+        ledIsShowed[i] = true;
+        ledColors[i] = subZeroColor;
         ledEffects[i] = SUB_ZERO;
-  }
+  }*/
 }
 void LedClockOn7Segments::drowTimeOnDispley(showingLedEffects effect){
     drowTimeOnDispley(curentTime / 3600, (curentTime % 3600) / 60, effect);
 }
 
 void LedClockOn7Segments::drowDotes(showingLedEffects effect){
-    for(byte i = SEGMENT_LED_COUNT*7*2; i < SEGMENT_LED_COUNT*7*2 +DOTES_LED_COUNT; i++){
-        ledSource[i] = clockColor;
+    
+    drowLedSegment(ledMain, SEGMENT_LED_COUNT*7*2, DOTES_LED_COUNT, clockColor, effect);
+    /*for(byte i = SEGMENT_LED_COUNT*7*2; i < SEGMENT_LED_COUNT*7*2 +DOTES_LED_COUNT; i++){
+        ledIsShowed[i] = true;
+        ledColors[i] = clockColor;
         ledEffects[i] = effect;
-    }
+    }*/
 }
 
 void LedClockOn7Segments::drowTimeOnDispley(byte hour, byte minutes, showingLedEffects effect){     
@@ -103,31 +168,42 @@ void LedClockOn7Segments::drowNumber(int startindex, byte number, showingLedEffe
     CRGB segmentColor = CRGB::Black;
     int z = 0;
     for (int i = 0; i < 7; i++) {
-        segmentColor = ((numbers[number] & 1 << i) == 1 << i) ? clockColor : CRGB::Black;
-        for(int j = 0; j < SEGMENT_LED_COUNT; j++){
-            ledSource[z + startindex] = segmentColor;
+        bool isShowed = (numbers[number] & 1 << i) == 1 << i;
+        segmentColor = isShowed ? clockColor : CRGB::Black;
+        drowLedSegment(ledMain, z + startindex, SEGMENT_LED_COUNT, segmentColor, effect, isShowed);
+        z += SEGMENT_LED_COUNT;
+       /* for(int j = 0; j < SEGMENT_LED_COUNT; j++){
+            ledMain[z + startindex].isShowed = isShowed;
+            ledIsShowed[z + startindex] = isShowed;
+            ledColors[z + startindex] = segmentColor;
             ledEffects[z + startindex] = effect;//эффект показа, тут
             z++;
-        }
+        }*/
   }
 }
 
-void LedClockOn7Segments::regularRender(){
+
+void LedClockOn7Segments::render(CRGB displayLed[]){
+    if(millis() % 250 == 0){
+        for(int i = 0; i < NUM_LEDS; i++){
+            //displayLed[i] = applyEffectsToDisplayLedByIndex(i);
+            displayLed[i] = applyPixelEffect(ledMain[i]);
+        }
+        isDisplayModifyded = false;
+        CurFastLED.setBrightness( 20 );
+        CurFastLED.show();
+    }
     
 }
 
-void LedClockOn7Segments::cron(){
-    
-    
-}
-void LedClockOn7Segments::render(CRGB displayLed[]){
-    if(cronCounter % 2 == 0){
-        for(int i = 0; i < NUM_LEDS; i++){
-            displayLed[i] = applyEffectsToDisplayLedByIndex(i);
-        }
-        isDisplayModifyded = false;
-        CurFastLED.show();
+void LedClockOn7Segments::renderIcons(CRGB displayLed[]){
+
+    for(int i = 0; i < NUM_ICON_LEDS; i++){
+        displayLed[i] = applyPixelEffect(ledIcons[i]);
     }
+    isDisplayModifyded = false;
+    CurFastLED.setBrightness( 12 );
+    CurFastLED.show();   
     
 }
 
@@ -135,14 +211,20 @@ CRGB LedClockOn7Segments::applyEffectsToDisplayLedByIndex(byte i){
     switch (ledEffects[i])
     {
     case DAYLY:
-        return ledSource[i];
+        return ledColors[i];
         break;
     case OFF:
-        return  CRGB::Black;
+        return  CRGB::Black;        
+        break;
+    case SUB_ZERO:
+        return  ledIsShowed[i]  ? subZeroColor : CRGB::Black;
+        break;
+    case PLUS_ZERO:
+        return  ledIsShowed[i]  ? plusZeroColor : CRGB::Black;
         break;
     case BLINK:
         if(cronCounter % 4 < 2) {
-            return ledSource[i];
+            return ledColors[i];
         }
         else{
             return CRGB::Black;
@@ -150,7 +232,38 @@ CRGB LedClockOn7Segments::applyEffectsToDisplayLedByIndex(byte i){
         break;
     
     default:
-        return ledSource[i];
+        return ledColors[i];
+        break;
+    }
+    
+}
+
+CRGB LedClockOn7Segments::applyPixelEffect(LedPixel ledPixel){
+    switch (ledPixel.effect)
+    {
+    case DAYLY:
+        return ledPixel.color;
+        break;
+    case OFF:
+        return  CRGB::Black;        
+        break;
+    case SUB_ZERO:
+        return  ledPixel.isShowed  ? subZeroColor : CRGB::Black;
+        break;
+    case PLUS_ZERO:
+        return  ledPixel.isShowed  ? plusZeroColor : CRGB::Black;
+        break;
+    case BLINK:
+        if(cronCounter % 4 < 2) {
+            return ledPixel.color;
+        }
+        else{
+            return CRGB::Black;
+        }
+        break;
+    
+    default:
+        return ledPixel.color;
         break;
     }
     
