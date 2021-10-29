@@ -31,11 +31,10 @@ void LedClockOn7Segments::tic(){
         drowTimeOnDispley();
         break;
     case CUR_T_OUTDOOR:
-        if(ledClock.outdoorStats.canBeShowed()){
-            drowTemperatureOnDispley(ledClock.outdoorStats.getCurentTemperature());
-        }else{
-            state = CUR_TIME;
-        }
+        drowTemperatureIfCan(ledClock.outdoorStats);        
+        break;
+    case CUR_T_INDOOR:
+        drowTemperatureIfCan(ledClock.indoorStats);        
         break;
     
     default:
@@ -111,10 +110,17 @@ void LedClockOn7Segments::drowLedSegment(LedPixel ledArray[], byte start, byte c
         }
 }
 
-
+void LedClockOn7Segments::drowTemperatureIfCan(TemperatureSensorStats tStats){
+    if(tStats.canBeShowed()){
+        drowTemperatureOnDispley(tStats.getCurentTemperature());
+        drowIcon(tStats.getIcon());
+    }else{
+        state = CUR_TIME;
+    }
+}
 
 void LedClockOn7Segments::drowTemperatureOnDispley(int temperature){
-    
+    isDisplayModifyded = true;
     int templ = abs(temperature) / 10;
     int tempr = abs(temperature) % 10;    
     

@@ -70,14 +70,18 @@ class LedClockOn7Segments{
         
         void drowDotes(showingLedEffects effect = BLINK);
         void drowSign();
+
+        void drowTemperatureIfCan(TemperatureSensorStats tStats);
+
+
         CRGB applyEffectsToDisplayLedByIndex(byte i);
         CRGB applyPixelEffect(LedPixel ledPixel);
         
         
     public:
         
-        TemperatureSensorStats outdoorStats = TemperatureSensorStats();
-        TemperatureSensorStats indoorStats = TemperatureSensorStats();
+        TemperatureSensorStats outdoorStats = TemperatureSensorStats(OUTDOOR_T);
+        TemperatureSensorStats indoorStats = TemperatureSensorStats(INDOOR_T);
 
         unsigned long cronCounter = 0;
         

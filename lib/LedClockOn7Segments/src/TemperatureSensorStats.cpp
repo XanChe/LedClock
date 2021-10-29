@@ -3,8 +3,9 @@
 #include <LibConfig.h>
 
 
-TemperatureSensorStats::TemperatureSensorStats(/* args */)
+TemperatureSensorStats::TemperatureSensorStats(icons ic)
 {
+    icon = ic;
     for(byte i; i <24; i++){
         maxTemperatureStatsArray[i] = -200.0;
         minTemperatureStatsArray[i] = 1500;
@@ -46,4 +47,8 @@ int TemperatureSensorStats::getCurentTemperature(){
 }
 bool TemperatureSensorStats::canBeShowed(){
     return isValide;
+}
+
+icons TemperatureSensorStats::getIcon(){
+    return icon;
 }

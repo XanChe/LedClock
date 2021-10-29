@@ -9,19 +9,20 @@ private:
     
     unsigned long lastDataCommit = 0;
     bool isValide = true;
-
+    icons icon;
     float currentTmeperature = -200.0;
     float maxTemperatureStatsArray[24]; 
     float minTemperatureStatsArray[24]; 
 
 public:
-    TemperatureSensorStats(/* args */);
+    TemperatureSensorStats(icons ic);
     
     void putCurrentTemperature(byte day, byte hour, byte minute, float temperature);
     int getMaxtemperature();
     int getMintemperature();
     int getCurentTemperature();
     bool canBeShowed();
+    icons getIcon();
 };
 
 
