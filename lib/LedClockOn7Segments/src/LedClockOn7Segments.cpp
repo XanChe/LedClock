@@ -1,6 +1,15 @@
 #include <LedClockOn7Segments.h>
 #include <stdlib.h>
-
+/*
+ *       ---
+ *     |  6  |
+ *    7|     |5
+ *       ---
+ *     |  4  |
+ *    3|     |1
+ *       ---
+ *       2
+ */
 byte numbers[] = {
     0b01110111, // 0    
     0b00010001, // 1
@@ -16,7 +25,7 @@ byte numbers[] = {
     0b01100110, // CHAR_C
   };
 
-void LedClockOn7Segments::tic(){
+void LedClockOn7Segments::tick(){
     if((millis() - mil) >=500){
         cronCounter++;
         mil = millis();        
@@ -24,7 +33,7 @@ void LedClockOn7Segments::tic(){
     if(millis() % 12000 == 0){
        if(*timeUpdateCallbackFunction!=NULL)timeUpdateCallbackFunction(); 
     }
-
+    //drowTemperatureIfCan(ledClock.indoorStats);
     switch (clockState.getClockState())
     {
     case CUR_TIME:
@@ -63,7 +72,7 @@ void LedClockOn7Segments::setCurTime( byte day, byte hour, byte minutes, byte se
 }
 
 void LedClockOn7Segments::clearDispley(){
-    
+     isIconsModifyded = true;
     drowLedSegment(ledMain, 0, NUM_LEDS, CRGB::Black, OFF, false);
     /*for(byte i =0;i < NUM_LEDS; i++){
         ledIsShowed[i] = false;
@@ -117,13 +126,14 @@ void LedClockOn7Segments::drowLedSegment(LedPixel ledArray[], byte start, byte c
 void LedClockOn7Segments::drowTemperatureIfCan(TemperatureSensorStats tStats){
     if(tStats.canBeShowed(curentDateTimeInMinutes)){
         drowTemperatureOnDispley(tStats.getCurentTemperature());
-        drowIcon(tStats.getIcon());
+        //drowIcon(tStats.getIcon());
     }else{
         clockState.changeStateTo(CUR_TIME);
     }
 }
 
 void LedClockOn7Segments::drowTemperatureOnDispley(int temperature){
+    clearDispley();
     isDisplayModifyded = true;
     int templ = abs(temperature) / 10;
     int tempr = abs(temperature) % 10;    
@@ -145,7 +155,7 @@ void LedClockOn7Segments::drowSign(){
 }
 
 void LedClockOn7Segments::drowTimeOnDispley(showingLedEffects effect){
-    drowTimeOnDispley(curentHour, curentMinute, effect);
+    drowTimeOnDispley(curentTime / 3600, (curentTime % 3600) / 60, effect);
 }
 
 void LedClockOn7Segments::drowDotes(showingLedEffects effect){
@@ -154,10 +164,11 @@ void LedClockOn7Segments::drowDotes(showingLedEffects effect){
 }
 
 void LedClockOn7Segments::drowTimeOnDispley(byte hour, byte minutes, showingLedEffects effect){     
-    
-    drowMinutes(minutes, state != MENU_MINUTES ? effect : BLINK);    
-    drowDotes(state == CUR_TIME ? BLINK : OFF);  
-    drowHour(hour, state != MENU_HOUR ? effect : BLINK);     
+
+    clearDispley();    
+    drowMinutes(minutes, !clockState.equals(MENU_MINUTES) ? effect : BLINK);    
+    drowDotes(clockState.equals(CUR_TIME) ? BLINK : OFF);  
+    drowHour(hour, !clockState.equals(MENU_HOUR) ? effect : BLINK);     
 }
 
 void LedClockOn7Segments::drowHour(byte hour, showingLedEffects effect){
@@ -186,7 +197,7 @@ void LedClockOn7Segments::drowNumber(int startindex, byte number, showingLedEffe
 
 
 void LedClockOn7Segments::render(CRGB displayLed[]){
-    if(millis() % 250 == 0){
+    if(millis() % 250 == 0 and isDisplayModifyded){
         for(int i = 0; i < NUM_LEDS; i++){
             //displayLed[i] = applyEffectsToDisplayLedByIndex(i);
             displayLed[i] = applyPixelEffect(ledMain[i]);
@@ -209,36 +220,6 @@ void LedClockOn7Segments::renderIcons(CRGB displayLed[]){
     }    
 }
 
-CRGB LedClockOn7Segments::applyEffectsToDisplayLedByIndex(byte i){
-    switch (ledEffects[i])
-    {
-    case DAYLY:
-        return ledColors[i];
-        break;
-    case OFF:
-        return  CRGB::Black;        
-        break;
-    case SUB_ZERO:
-        return  ledIsShowed[i]  ? subZeroColor : CRGB::Black;
-        break;
-    case PLUS_ZERO:
-        return  ledIsShowed[i]  ? plusZeroColor : CRGB::Black;
-        break;
-    case BLINK:
-        if(cronCounter % 4 < 2) {
-            return ledColors[i];
-        }
-        else{
-            return CRGB::Black;
-        }
-        break;
-    
-    default:
-        return ledColors[i];
-        break;
-    }
-    
-}
 
 CRGB LedClockOn7Segments::applyPixelEffect(LedPixel ledPixel){
     switch (ledPixel.effect)
@@ -279,8 +260,12 @@ void LedClockOn7Segments::setCurentOutdoorTemperature(float t){
     setCurentTemperature(outdoorStats, t);
 }
 
-void LedClockOn7Segments::setCurentTemperature(TemperatureSensorStats tStats, float t){
+void LedClockOn7Segments::setCurentTemperature(TemperatureSensorStats &tStats, float t){
     tStats.putCurrentTemperature(curentDateTimeInMinutes, curentHour, curentMinute, t);
+}
+
+void LedClockOn7Segments::switchModeButtonClick(){
+    clockState.changeNextAvailable();
 }
 
 LedClockOn7Segments ledClock = LedClockOn7Segments();

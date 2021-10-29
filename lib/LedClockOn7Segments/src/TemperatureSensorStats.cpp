@@ -14,10 +14,12 @@ TemperatureSensorStats::TemperatureSensorStats(icons ic)
 
 void TemperatureSensorStats::putCurrentTemperature(unsigned long dateTimeInMinutes, byte hour, byte minute, float temperature){
 
-    if(temperature<1000 && temperature >-150){
+    
+    if(temperature<1000.0 && temperature >-150.0){
         lastDataCommit = dateTimeInMinutes;
         currentTmeperature = temperature;
     }
+    
     isValide = abs(dateTimeInMinutes - lastDataCommit ) <= SENSOR_TIMEOUT_IN_MINUTE;
     if(minute == 0) {
         maxTemperatureStatsArray[hour] = temperature;
@@ -49,6 +51,7 @@ int TemperatureSensorStats::getCurentTemperature(){
     return currentTmeperature;
 }
 bool TemperatureSensorStats::canBeShowed(unsigned long dateTimeInMinutes){
+   
     isValide = abs(dateTimeInMinutes - lastDataCommit ) <= SENSOR_TIMEOUT_IN_MINUTE;
     return isValide;
 }

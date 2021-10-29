@@ -2,10 +2,15 @@
 
 #include <Wire.h> // must be included here so that Arduino library object file references work
 #include <RtcDS3231.h>
+#include <OneButton.h>
 RtcDS3231<TwoWire> Rtc(Wire);
 
 CRGBArray<NUM_LEDS> leds;
 CRGBArray<NUM_ICON_LEDS> ledIcons;
+
+OneButton button1(A1, true);
+
+
 #define countof(a) (sizeof(a) / sizeof(a[0]))
 void printDateTime(const RtcDateTime& dt)
 {
@@ -71,7 +76,10 @@ void start_clockDS3231(){
         Rtc.SetIsRunning(true);
     }
 }
-
+void clickSwitchMenu(){
+  Serial.println("CLick1");
+  ledClock.switchModeButtonClick();
+}
 void setup() {
   Serial.begin(9600);
   
@@ -84,28 +92,57 @@ void setup() {
   
   ledClock.assignFastLED(FastLED);
   ledClock.setCurTime(1,8,58,33);
+  ledClock.setCurentIndoorTemperature(23);
+  ledClock.setCurentOutdoorTemperature(-15);
+  
+  
+
+  ledClock.setCurTime(1,1,10,0);
+ // ledClock.outdoorStats.putCurrentTemperature(1510,1,10,-25.0);
+  ledClock.setCurentOutdoorTemperature(-15);
+  delay(1000);
+  ledClock.setCurTime(1,1,11,0);
+  ledClock.setCurentOutdoorTemperature(-12);
+ /* ledClock.switchModeButtonClick();
+  delay(1000);
+  ledClock.switchModeButtonClick();
+  delay(1000);
+  ledClock.switchModeButtonClick();
+  delay(1000);
+  ledClock.switchModeButtonClick();*/
+  // ledClock.outdoorStats.putCurrentTemperature(1510,1,10,-25.0);
   //ledClock.setTimeUpdateCallbackFunction(updateTime);
   //ledClock.
-  ledClock.drowTimeOnDispley();
-  
+  //ledClock.drowTimeOnDispley();
+   button1.attachClick( clickSwitchMenu);
   // put your setup code here, to run once:
 }
 
 void loop() {
+ 
+  button1.tick();
+  if(millis() % 1000 == 0) {
+    //ledClock.setCurTime(1,8,millis()%60000,millis()%1000);
+   /* ledClock.setCurentIndoorTemperature(23);
+    ledClock.setCurentOutdoorTemperature(-15);*/
+  }
   
+   // ledClock.switchModeButtonClick();
+    /*ledClock.setCurentIndoorTemperature(23);
+    ledClock.setCurentOutdoorTemperature(-15);
+    ledClock.switchModeButtonClick();*/
+ 
   
-  
-  
-  //ledClock.tic();
+  ledClock.tick();
   //ledClock.drowHour(88,PLUS_ZERO);
   //ledClock.drowMinutes(88,SUB_ZERO);
 
-  ledClock.drowTemperatureOnDispley(-35);
+  //ledClock.drowTemperatureOnDispley(-35);
 
   ledClock.render(leds);
   
  
-  ledClock.drowIcon(ALL);
+  
   ledClock.renderIcons(ledIcons);
 
 }

@@ -41,10 +41,8 @@ class LedClockOn7Segments{
         byte curentSecond = 0;
         unsigned long curentTime = 0;
         unsigned long curentDateTimeInMinutes = 0;
-        int tOut = -200;
-        int tIn  = -200;
-        
-        
+       
+        unsigned long cronCounter = 0;      
 
         void (*timeUpdateCallbackFunction)();
 
@@ -52,16 +50,13 @@ class LedClockOn7Segments{
 
         CFastLED CurFastLED;
 
-        ClockState clockState = ClockState(CUR_T_OUTDOOR);
-        clockStates state = CUR_T_OUTDOOR;
+        ClockState clockState = ClockState(CUR_TIME);
+       // clockStates state = CUR_T_OUTDOOR;
         
 
         LedPixel ledIcons[NUM_ICON_LEDS];
         LedPixel ledMain[NUM_LEDS];
-        bool ledIsShowed[NUM_LEDS];
-        CRGB ledColors[NUM_LEDS];
-        showingLedEffects ledEffects[NUM_LEDS];
-        
+             
         CRGB clockColor = CRGB::Green;
         CRGB subZeroColor = CRGB::Blue;
         CRGB plusZeroColor = CRGB::Orange;
@@ -81,17 +76,16 @@ class LedClockOn7Segments{
         void drowTemperatureIfCan(TemperatureSensorStats tStats);
 
 
-        CRGB applyEffectsToDisplayLedByIndex(byte i);
+       // CRGB applyEffectsToDisplayLedByIndex(byte i);
         CRGB applyPixelEffect(LedPixel ledPixel);
         
-        void setCurentTemperature(TemperatureSensorStats tStats, float t);
+        void setCurentTemperature(TemperatureSensorStats &tStats, float t);
         
     public:
         
         TemperatureSensorStats outdoorStats = TemperatureSensorStats(OUTDOOR_T);
         TemperatureSensorStats indoorStats = TemperatureSensorStats(INDOOR_T);
-
-        unsigned long cronCounter = 0;
+        
         
         void assignFastLED(CFastLED fLED);        
         void setStateTo(clockStates state);
@@ -99,9 +93,9 @@ class LedClockOn7Segments{
         void setCurTime(byte day, byte hour, byte minutes, byte seconds);
         void setCurentIndoorTemperature(float t);
         void setCurentOutdoorTemperature(float t);
-        void tic();
+        void tick();
 
-        
+        void switchModeButtonClick();
 
         void clearDispley();
         void clearIcons();

@@ -13,6 +13,7 @@ public:
     ClockState(clockStates st);
     void changeStateTo(clockStates st, byte worckDuration = 15);
     bool equals(clockStates st);
+    void changeNextAvailable();
     clockStates getClockState();
 };
 
