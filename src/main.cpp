@@ -26,7 +26,7 @@ void updateTime(){
   RtcDateTime now = Rtc.GetDateTime();
   printDateTime(now);
   
-  ledClock.setCurTime((byte)now.Hour(), (byte)now.Minute(), (byte)now.Second());
+  ledClock.setCurTime((byte)now.Day(), (byte)now.Hour(), (byte)now.Minute(), (byte)now.Second());
   
 
   
@@ -83,8 +83,9 @@ void setup() {
   FastLED.setTemperature( TEMPERATURE_1 );
   
   ledClock.assignFastLED(FastLED);
-  ledClock.setCurTime(8,58,33);
+  ledClock.setCurTime(1,8,58,33);
   //ledClock.setTimeUpdateCallbackFunction(updateTime);
+  //ledClock.
   ledClock.drowTimeOnDispley();
   
   // put your setup code here, to run once:
@@ -93,15 +94,18 @@ void setup() {
 void loop() {
   
   
-
   
-  ledClock.tic();
+  
+  //ledClock.tic();
   //ledClock.drowHour(88,PLUS_ZERO);
   //ledClock.drowMinutes(88,SUB_ZERO);
+
+  ledClock.drowTemperatureOnDispley(-35);
+
   ledClock.render(leds);
   
  
-  ledClock.drowIcon(FADE_ALL);
+  ledClock.drowIcon(ALL);
   ledClock.renderIcons(ledIcons);
 
 }

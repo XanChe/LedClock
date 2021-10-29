@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <LibEnums.h>
 #include <TemperatureSensorStats.h>
+#include <ClockState.h>
 #include <LibConfig.h>
 #include <FastLED.h>
 
@@ -21,7 +22,7 @@
 
 #define CHAR_UP_ZERO 10
 #define CHAR_C 11
-#define SENSOR_TIMEOUT_IN_MINUTE 10
+
 
 
 struct LedPixel
@@ -35,7 +36,11 @@ struct LedPixel
 class LedClockOn7Segments{
     private:
         
+        byte curentHour = 0;
+        byte curentMinute = 0;
+        byte curentSecond = 0;
         unsigned long curentTime = 0;
+        unsigned long curentDateTimeInMinutes = 0;
         int tOut = -200;
         int tIn  = -200;
         
@@ -47,7 +52,9 @@ class LedClockOn7Segments{
 
         CFastLED CurFastLED;
 
+        ClockState clockState = ClockState(CUR_T_OUTDOOR);
         clockStates state = CUR_T_OUTDOOR;
+        
 
         LedPixel ledIcons[NUM_ICON_LEDS];
         LedPixel ledMain[NUM_LEDS];
@@ -77,6 +84,7 @@ class LedClockOn7Segments{
         CRGB applyEffectsToDisplayLedByIndex(byte i);
         CRGB applyPixelEffect(LedPixel ledPixel);
         
+        void setCurentTemperature(TemperatureSensorStats tStats, float t);
         
     public:
         
@@ -88,8 +96,9 @@ class LedClockOn7Segments{
         void assignFastLED(CFastLED fLED);        
         void setStateTo(clockStates state);
         void setTimeUpdateCallbackFunction(void (*func)());
-        void setCurTime(byte hour, byte minutes, byte seconds);
-
+        void setCurTime(byte day, byte hour, byte minutes, byte seconds);
+        void setCurentIndoorTemperature(float t);
+        void setCurentOutdoorTemperature(float t);
         void tic();
 
         
@@ -98,7 +107,7 @@ class LedClockOn7Segments{
         void clearIcons();
 
         void drowTimeOnDispley(showingLedEffects effect = DAYLY);
-        void drowTimeOnDispley(byte hour, byte minutes, showingLedEffects effect = DAYLY);
+        void drowTimeOnDispley( byte hour, byte minutes, showingLedEffects effect = DAYLY);
         
         void drowTemperatureOnDispley(int t);        
 

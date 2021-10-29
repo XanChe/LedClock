@@ -17,11 +17,11 @@ private:
 public:
     TemperatureSensorStats(icons ic);
     
-    void putCurrentTemperature(byte day, byte hour, byte minute, float temperature);
+    void putCurrentTemperature(unsigned long dateTimeInMinutes, byte hour, byte minute, float temperature);
     int getMaxtemperature();
     int getMintemperature();
     int getCurentTemperature();
-    bool canBeShowed();
+    bool canBeShowed(unsigned long dateTimeInMinutes);
     icons getIcon();
 };
 

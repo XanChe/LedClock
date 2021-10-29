@@ -25,7 +25,7 @@ void LedClockOn7Segments::tic(){
        if(*timeUpdateCallbackFunction!=NULL)timeUpdateCallbackFunction(); 
     }
 
-    switch (state)
+    switch (clockState.getClockState())
     {
     case CUR_TIME:
         drowTimeOnDispley();
@@ -53,8 +53,12 @@ void LedClockOn7Segments::assignFastLED(CFastLED fLED){
 }
 
 
-void LedClockOn7Segments::setCurTime(byte hour, byte minutes, byte seconds){
+void LedClockOn7Segments::setCurTime( byte day, byte hour, byte minutes, byte seconds){
+    curentHour = hour;
+    curentMinute = minutes;
+    curentSecond = seconds;
     curentTime = ((unsigned long)hour * 3600) + ((unsigned long)minutes * 60) + (unsigned long)seconds;
+    curentDateTimeInMinutes = (unsigned long)day * 1440 + (unsigned long)hour * 60 + (unsigned long)minutes;
         
 }
 
@@ -111,11 +115,11 @@ void LedClockOn7Segments::drowLedSegment(LedPixel ledArray[], byte start, byte c
 }
 
 void LedClockOn7Segments::drowTemperatureIfCan(TemperatureSensorStats tStats){
-    if(tStats.canBeShowed()){
+    if(tStats.canBeShowed(curentDateTimeInMinutes)){
         drowTemperatureOnDispley(tStats.getCurentTemperature());
         drowIcon(tStats.getIcon());
     }else{
-        state = CUR_TIME;
+        clockState.changeStateTo(CUR_TIME);
     }
 }
 
@@ -141,7 +145,7 @@ void LedClockOn7Segments::drowSign(){
 }
 
 void LedClockOn7Segments::drowTimeOnDispley(showingLedEffects effect){
-    drowTimeOnDispley(curentTime / 3600, (curentTime % 3600) / 60, effect);
+    drowTimeOnDispley(curentHour, curentMinute, effect);
 }
 
 void LedClockOn7Segments::drowDotes(showingLedEffects effect){
@@ -265,6 +269,18 @@ CRGB LedClockOn7Segments::applyPixelEffect(LedPixel ledPixel){
         break;
     }
     
+}
+
+void LedClockOn7Segments::setCurentIndoorTemperature(float t){
+    setCurentTemperature(indoorStats, t);
+}
+
+void LedClockOn7Segments::setCurentOutdoorTemperature(float t){
+    setCurentTemperature(outdoorStats, t);
+}
+
+void LedClockOn7Segments::setCurentTemperature(TemperatureSensorStats tStats, float t){
+    tStats.putCurrentTemperature(curentDateTimeInMinutes, curentHour, curentMinute, t);
 }
 
 LedClockOn7Segments ledClock = LedClockOn7Segments();

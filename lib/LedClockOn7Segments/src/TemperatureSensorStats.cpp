@@ -12,10 +12,13 @@ TemperatureSensorStats::TemperatureSensorStats(icons ic)
     }
 }
 
-void TemperatureSensorStats::putCurrentTemperature(byte day, byte hour, byte minute, float temperature){
+void TemperatureSensorStats::putCurrentTemperature(unsigned long dateTimeInMinutes, byte hour, byte minute, float temperature){
 
-    if(temperature<1000 && temperature >-150)lastDataCommit = (unsigned long)day * 1440 + (unsigned long)hour * 60 + (unsigned long)minute;
-    isValide = ((unsigned long)day * 1440 + (unsigned long)hour * 60 + (unsigned long)minute) - lastDataCommit <= 10;
+    if(temperature<1000 && temperature >-150){
+        lastDataCommit = dateTimeInMinutes;
+        currentTmeperature = temperature;
+    }
+    isValide = abs(dateTimeInMinutes - lastDataCommit ) <= SENSOR_TIMEOUT_IN_MINUTE;
     if(minute == 0) {
         maxTemperatureStatsArray[hour] = temperature;
         minTemperatureStatsArray[hour] = temperature;
@@ -45,7 +48,8 @@ int TemperatureSensorStats::getCurentTemperature(){
     
     return currentTmeperature;
 }
-bool TemperatureSensorStats::canBeShowed(){
+bool TemperatureSensorStats::canBeShowed(unsigned long dateTimeInMinutes){
+    isValide = abs(dateTimeInMinutes - lastDataCommit ) <= SENSOR_TIMEOUT_IN_MINUTE;
     return isValide;
 }
 
