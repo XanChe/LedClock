@@ -31,7 +31,11 @@ void LedClockOn7Segments::tic(){
         drowTimeOnDispley();
         break;
     case CUR_T_OUTDOOR:
-        drowTemperatureOnDispley(-35);
+        if(ledClock.outdoorStats.canBeShowed()){
+            drowTemperatureOnDispley(ledClock.outdoorStats.getCurentTemperature());
+        }else{
+            state = CUR_TIME;
+        }
         break;
     
     default:
@@ -56,14 +60,17 @@ void LedClockOn7Segments::setCurTime(byte hour, byte minutes, byte seconds){
 }
 
 void LedClockOn7Segments::clearDispley(){
-    for(byte i =0;i < NUM_LEDS; i++){
+    
+    drowLedSegment(ledMain, 0, NUM_LEDS, CRGB::Black, OFF, false);
+    /*for(byte i =0;i < NUM_LEDS; i++){
         ledIsShowed[i] = false;
         ledColors[i] = CRGB::Black;
         ledEffects[i] = DAYLY;
-    }
+    }*/
 }
 
 void LedClockOn7Segments::drowIcon(icons icon){
+    isIconsModifyded = true;
     switch (icon)
     {
     case icons::INDOOR_T:
@@ -121,27 +128,19 @@ void LedClockOn7Segments::drowTemperatureOnDispley(int temperature){
     if(temperature<0)drowSign();   
       
 }
+
 void LedClockOn7Segments::drowSign(){
     
-    drowLedSegment(ledMain, SEGMENT_LED_COUNT*28+DOTES_LED_COUNT, 2, subZeroColor, SUB_ZERO);
-    /*for(int i = SEGMENT_LED_COUNT*28+DOTES_LED_COUNT; i < SEGMENT_LED_COUNT*28+DOTES_LED_COUNT + SEGMENT_LED_COUNT; i++){
-        ledIsShowed[i] = true;
-        ledColors[i] = subZeroColor;
-        ledEffects[i] = SUB_ZERO;
-  }*/
+    drowLedSegment(ledMain, SEGMENT_LED_COUNT*28+DOTES_LED_COUNT, 2, subZeroColor, SUB_ZERO);    
 }
+
 void LedClockOn7Segments::drowTimeOnDispley(showingLedEffects effect){
     drowTimeOnDispley(curentTime / 3600, (curentTime % 3600) / 60, effect);
 }
 
 void LedClockOn7Segments::drowDotes(showingLedEffects effect){
     
-    drowLedSegment(ledMain, SEGMENT_LED_COUNT*7*2, DOTES_LED_COUNT, clockColor, effect);
-    /*for(byte i = SEGMENT_LED_COUNT*7*2; i < SEGMENT_LED_COUNT*7*2 +DOTES_LED_COUNT; i++){
-        ledIsShowed[i] = true;
-        ledColors[i] = clockColor;
-        ledEffects[i] = effect;
-    }*/
+    drowLedSegment(ledMain, SEGMENT_LED_COUNT*7*2, DOTES_LED_COUNT, clockColor, effect);    
 }
 
 void LedClockOn7Segments::drowTimeOnDispley(byte hour, byte minutes, showingLedEffects effect){     
@@ -171,14 +170,7 @@ void LedClockOn7Segments::drowNumber(int startindex, byte number, showingLedEffe
         bool isShowed = (numbers[number] & 1 << i) == 1 << i;
         segmentColor = isShowed ? clockColor : CRGB::Black;
         drowLedSegment(ledMain, z + startindex, SEGMENT_LED_COUNT, segmentColor, effect, isShowed);
-        z += SEGMENT_LED_COUNT;
-       /* for(int j = 0; j < SEGMENT_LED_COUNT; j++){
-            ledMain[z + startindex].isShowed = isShowed;
-            ledIsShowed[z + startindex] = isShowed;
-            ledColors[z + startindex] = segmentColor;
-            ledEffects[z + startindex] = effect;//эффект показа, тут
-            z++;
-        }*/
+        z += SEGMENT_LED_COUNT;      
   }
 }
 
@@ -197,14 +189,14 @@ void LedClockOn7Segments::render(CRGB displayLed[]){
 }
 
 void LedClockOn7Segments::renderIcons(CRGB displayLed[]){
-
-    for(int i = 0; i < NUM_ICON_LEDS; i++){
-        displayLed[i] = applyPixelEffect(ledIcons[i]);
-    }
-    isDisplayModifyded = false;
-    CurFastLED.setBrightness( 12 );
-    CurFastLED.show();   
-    
+    if(isIconsModifyded){
+        for(int i = 0; i < NUM_ICON_LEDS; i++){
+            displayLed[i] = applyPixelEffect(ledIcons[i]);
+        }
+        isIconsModifyded = false;
+        CurFastLED.setBrightness( 12 );
+        CurFastLED.show();   
+    }    
 }
 
 CRGB LedClockOn7Segments::applyEffectsToDisplayLedByIndex(byte i){

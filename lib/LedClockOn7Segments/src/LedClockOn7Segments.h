@@ -1,9 +1,10 @@
 #ifndef LedClockOn7Segments_h
 #define LedClockOn7Segments_h
 #include <Arduino.h>
-//#include <libConfig.h>
+#include <LibEnums.h>
+#include <TemperatureSensorStats.h>
+#include <LibConfig.h>
 #include <FastLED.h>
-
 
 #define NUM_LEDS 88     
 #define NUM_ICON_LEDS 14 
@@ -20,36 +21,10 @@
 
 #define CHAR_UP_ZERO 10
 #define CHAR_C 11
+#define SENSOR_TIMEOUT_IN_MINUTE 10
 
-enum clockStates {
-    CUR_TIME,
-    CUR_T_OUTDOOR,
-    CUR_T_INDOOR,
-    MENU_MINUTES,
-    MENU_HOUR,
-};
 
-enum showingLedEffects {
-    DAYLY,
-    NIGHTLY,
-    BLINK,
-    OFF,
-    SUB_ZERO,
-    PLUS_ZERO,
-};
-
-enum icons {
-    MAX_T,
-    MIN_T,
-    OUTDOOR_T,
-    INDOOR_T,
-    SWITCH_BUTTON,
-    STAT_BUTTON,
-    ALL,
-    FADE_ALL,
-};
-
-typedef struct LedPixel
+struct LedPixel
 {
     bool isShowed = false;
     CRGB color = CRGB::Green;
@@ -64,6 +39,8 @@ class LedClockOn7Segments{
         int tOut = -200;
         int tIn  = -200;
         
+        
+
         void (*timeUpdateCallbackFunction)();
 
         unsigned long mil =0;
@@ -83,11 +60,13 @@ class LedClockOn7Segments{
         CRGB plusZeroColor = CRGB::Orange;
 
         
-        bool isDisplayModifyded = 0;
+        bool isDisplayModifyded = false;
+        bool isIconsModifyded = false;
         
         void drowLedSegment(LedPixel ledArray[], byte start, byte count, CRGB color, showingLedEffects effect, bool isShowed = true);
         void drowNumber(int startindex, byte number, showingLedEffects effect = DAYLY);
-        
+        void drowHour(byte hour, showingLedEffects effect = DAYLY);
+        void drowMinutes(byte minutes, showingLedEffects effect = DAYLY);
         
         void drowDotes(showingLedEffects effect = BLINK);
         void drowSign();
@@ -97,11 +76,11 @@ class LedClockOn7Segments{
         
     public:
         
-        
+        TemperatureSensorStats outdoorStats = TemperatureSensorStats();
+        TemperatureSensorStats indoorStats = TemperatureSensorStats();
 
         unsigned long cronCounter = 0;
-        void drowHour(byte hour, showingLedEffects effect = DAYLY);
-        void drowMinutes(byte minutes, showingLedEffects effect = DAYLY);
+        
         void assignFastLED(CFastLED fLED);        
         void setStateTo(clockStates state);
         void setTimeUpdateCallbackFunction(void (*func)());
@@ -126,6 +105,7 @@ class LedClockOn7Segments{
 
 
 };
+
 extern LedClockOn7Segments ledClock;
 
 #endif
