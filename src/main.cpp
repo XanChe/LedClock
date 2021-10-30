@@ -1,3 +1,5 @@
+#define FASTLED_ALLOW_INTERRUPTS 1
+#define FASTLED_INTERRUPT_RETRY_COUNT 1
 #include <LedClockOn7Segments.h>
 
 #include <Wire.h> // must be included here so that Arduino library object file references work
@@ -8,7 +10,8 @@ RtcDS3231<TwoWire> Rtc(Wire);
 CRGBArray<NUM_LEDS> leds;
 CRGBArray<NUM_ICON_LEDS> ledIcons;
 
-OneButton button1(A1, true);
+OneButton switchModeButton(9, true);
+OneButton statsButton(10, true);
 
 
 #define countof(a) (sizeof(a) / sizeof(a[0]))
@@ -80,6 +83,10 @@ void clickSwitchMenu(){
   Serial.println("CLick1");
   ledClock.switchModeButtonClick();
 }
+void clickStatsButton(){
+  Serial.println("CLick Stats");
+  ledClock.menuButtonClick();
+}
 void setup() {
   Serial.begin(9600);
   
@@ -89,7 +96,8 @@ void setup() {
   FastLED.addLeds<WS2811, DATA_ICON_PIN, GRB>(ledIcons, NUM_ICON_LEDS);
   FastLED.setBrightness( 15 );
   FastLED.setTemperature( TEMPERATURE_1 );
-  
+  FastLED.setMaxPowerInVoltsAndMilliamps(5, 500);
+
   ledClock.assignFastLED(FastLED);
   ledClock.setCurTime(1,8,58,33);
   ledClock.setCurentIndoorTemperature(23);
@@ -103,34 +111,16 @@ void setup() {
   delay(1000);
   ledClock.setCurTime(1,1,11,0);
   ledClock.setCurentOutdoorTemperature(-12);
- /* ledClock.switchModeButtonClick();
-  delay(1000);
-  ledClock.switchModeButtonClick();
-  delay(1000);
-  ledClock.switchModeButtonClick();
-  delay(1000);
-  ledClock.switchModeButtonClick();*/
-  // ledClock.outdoorStats.putCurrentTemperature(1510,1,10,-25.0);
-  //ledClock.setTimeUpdateCallbackFunction(updateTime);
-  //ledClock.
-  //ledClock.drowTimeOnDispley();
-   button1.attachClick( clickSwitchMenu);
+ 
+   switchModeButton.attachClick( clickSwitchMenu);
+   statsButton.attachClick(clickStatsButton);
   // put your setup code here, to run once:
 }
 
 void loop() {
  
-  button1.tick();
-  if(millis() % 1000 == 0) {
-    //ledClock.setCurTime(1,8,millis()%60000,millis()%1000);
-   /* ledClock.setCurentIndoorTemperature(23);
-    ledClock.setCurentOutdoorTemperature(-15);*/
-  }
-  
-   // ledClock.switchModeButtonClick();
-    /*ledClock.setCurentIndoorTemperature(23);
-    ledClock.setCurentOutdoorTemperature(-15);
-    ledClock.switchModeButtonClick();*/
+  switchModeButton.tick();
+  statsButton.tick();
  
   
   ledClock.tick();
@@ -138,12 +128,12 @@ void loop() {
   //ledClock.drowMinutes(88,SUB_ZERO);
 
   //ledClock.drowTemperatureOnDispley(-35);
-
+  ledClock.renderIcons(ledIcons);
   ledClock.render(leds);
   
  
   
-  ledClock.renderIcons(ledIcons);
+  
 
 }
 

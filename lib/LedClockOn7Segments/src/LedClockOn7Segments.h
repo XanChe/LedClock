@@ -55,12 +55,11 @@ class LedClockOn7Segments{
         
 
         LedPixel ledIcons[NUM_ICON_LEDS];
-        LedPixel ledMain[NUM_LEDS];
-             
-        CRGB clockColor = CRGB::Green;
-        CRGB subZeroColor = CRGB::Blue;
-        CRGB plusZeroColor = CRGB::Orange;
-
+        LedPixel ledMain[NUM_LEDS];             
+        
+        CHSV subZeroColor = CHSV(HUE_BLUE, 255, 255);
+        CHSV plusZeroColor = CHSV(HUE_ORANGE, 255, 255);
+        CHSV clockColor = CHSV(HUE_GREEN, 255, 255);
         
         bool isDisplayModifyded = false;
         bool isIconsModifyded = false;
@@ -75,6 +74,7 @@ class LedClockOn7Segments{
 
         void drowTemperatureIfCan(TemperatureSensorStats tStats);
 
+        void drowCurentState();
 
        // CRGB applyEffectsToDisplayLedByIndex(byte i);
         CRGB applyPixelEffect(LedPixel ledPixel);
@@ -96,6 +96,11 @@ class LedClockOn7Segments{
         void tick();
 
         void switchModeButtonClick();
+        void statsButtonClick();
+        void menuButtonClick();
+        void menuNextButtonClick();
+        void menuPlusButtonClick();
+        void menuMinusButtonClick();
 
         void clearDispley();
         void clearIcons();
