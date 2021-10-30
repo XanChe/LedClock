@@ -5,6 +5,7 @@
 #include <TemperatureSensorStats.h>
 #include <ClockState.h>
 #include <LibConfig.h>
+#include <ClockMenu.h>
 #include <FastLED.h>
 
 #define NUM_LEDS 88     
@@ -52,17 +53,18 @@ class LedClockOn7Segments{
 
         ClockState clockState = ClockState(CUR_TIME);
        // clockStates state = CUR_T_OUTDOOR;
-        
+        ClockMenu 
 
         LedPixel ledIcons[NUM_ICON_LEDS];
-        LedPixel ledMain[NUM_LEDS];             
+        LedPixel ledMain[NUM_LEDS];  
+
+        CRGB *mainLedsArray;    
+        CRGB *iconLedsArray;       
         
         CHSV subZeroColor = CHSV(HUE_BLUE, 255, 255);
         CHSV plusZeroColor = CHSV(HUE_ORANGE, 255, 255);
-        CHSV clockColor = CHSV(HUE_GREEN, 255, 255);
+        CHSV clockColor = CHSV(HUE_GREEN, 255, 255);        
         
-        bool isDisplayModifyded = false;
-        bool isIconsModifyded = false;
         
         void drowLedSegment(LedPixel ledArray[], byte start, byte count, CRGB color, showingLedEffects effect, bool isShowed = true);
         void drowNumber(int startindex, byte number, showingLedEffects effect = DAYLY);
@@ -72,14 +74,14 @@ class LedClockOn7Segments{
         void drowDotes(showingLedEffects effect = BLINK);
         void drowSign();
 
-        void drowTemperatureIfCan(TemperatureSensorStats tStats);
+        bool drowTemperatureIfCan(TemperatureSensorStats tStats);
 
         void drowCurentState();
 
        // CRGB applyEffectsToDisplayLedByIndex(byte i);
         CRGB applyPixelEffect(LedPixel ledPixel);
         
-        void setCurentTemperature(TemperatureSensorStats &tStats, float t);
+        void setCurentTemperature(TemperatureSensorStats &tStats, char t);
         
     public:
         
@@ -87,12 +89,16 @@ class LedClockOn7Segments{
         TemperatureSensorStats indoorStats = TemperatureSensorStats(INDOOR_T);
         
         
-        void assignFastLED(CFastLED fLED);        
+        void assignFastLED(CFastLED &fLED);  
+        void attachTimeUpdateFunction(void (*func)());
+        void attachMainLedsArray(CRGB lesArray[]);
+        void attachIconLedsArray(CRGB lesArray[]);
+
         void setStateTo(clockStates state);
-        void setTimeUpdateCallbackFunction(void (*func)());
+        
         void setCurTime(byte day, byte hour, byte minutes, byte seconds);
-        void setCurentIndoorTemperature(float t);
-        void setCurentOutdoorTemperature(float t);
+        void setCurentIndoorTemperature(char t);
+        void setCurentOutdoorTemperature(char t);
         void tick();
 
         void switchModeButtonClick();
@@ -112,6 +118,7 @@ class LedClockOn7Segments{
 
         void drowIcon(icons icon);        
 
+        void render();
         void render(CRGB displayLed[]);
         void renderIcons(CRGB displayLed[]);
 

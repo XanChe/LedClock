@@ -3,9 +3,10 @@
 #include <LedClockOn7Segments.h>
 
 #include <Wire.h> // must be included here so that Arduino library object file references work
-#include <RtcDS3231.h>
+#include <RTClib.h>
 #include <OneButton.h>
-RtcDS3231<TwoWire> Rtc(Wire);
+
+RTC_DS3231 rtc;
 
 CRGBArray<NUM_LEDS> leds;
 CRGBArray<NUM_ICON_LEDS> ledIcons;
@@ -14,33 +15,35 @@ OneButton switchModeButton(9, true);
 OneButton statsButton(10, true);
 
 
-#define countof(a) (sizeof(a) / sizeof(a[0]))
-void printDateTime(const RtcDateTime& dt)
-{
-    char datestring[20];
 
-    snprintf_P(datestring, 
-            countof(datestring),
-            PSTR("%02u/%02u/%04u %02u:%02u:%02u"),
-            dt.Month(),
-            dt.Day(),
-            dt.Year(),
-            dt.Hour(),
-            dt.Minute(),
-            dt.Second() );
-    Serial.print(datestring);
-}
 void updateTime(){
-  RtcDateTime now = Rtc.GetDateTime();
-  printDateTime(now);
+  /*RtcDateTime now = Rtc.GetDateTime(); 
   
-  ledClock.setCurTime((byte)now.Day(), (byte)now.Hour(), (byte)now.Minute(), (byte)now.Second());
-  
-
+  ledClock.setCurTime((byte)now.Day(), (byte)now.Hour(), (byte)now.Minute(), (byte)now.Second());*/
+  DateTime now = rtc.now();
+  ledClock.setCurTime((byte)now.day(), (byte)now.hour(), (byte)now.minute(), (byte)now.second());
   
 }
 
 void start_clockDS3231(){
+  
+  if (! rtc.begin()) {
+    Serial.println("Couldn't find RTC");
+    Serial.flush();
+    abort();
+  }
+
+  if (rtc.lostPower()) {
+    Serial.println("RTC lost power, let's set the time!");
+    // When time needs to be set on a new device, or after a power loss, the
+    // following line sets the RTC to the date & time this sketch was compiled
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    // This line sets the RTC with an explicit date & time, for example to set
+    // January 21, 2014 at 3am you would call:
+    // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
+  }
+  
+  /*
   Rtc.Begin();
 
     RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
@@ -77,7 +80,7 @@ void start_clockDS3231(){
     {
         Serial.println("RTC was not actively running, starting now");
         Rtc.SetIsRunning(true);
-    }
+    }*/
 }
 void clickSwitchMenu(){
   Serial.println("CLick1");
@@ -90,7 +93,7 @@ void clickStatsButton(){
 void setup() {
   Serial.begin(9600);
   
-  //start_clockDS3231();
+  start_clockDS3231();
   
   FastLED.addLeds<WS2811, DATA_PIN, GRB>(leds, NUM_LEDS);
   FastLED.addLeds<WS2811, DATA_ICON_PIN, GRB>(ledIcons, NUM_ICON_LEDS);
@@ -99,18 +102,23 @@ void setup() {
   FastLED.setMaxPowerInVoltsAndMilliamps(5, 500);
 
   ledClock.assignFastLED(FastLED);
-  ledClock.setCurTime(1,8,58,33);
+  ledClock.attachMainLedsArray(leds);
+  ledClock.attachIconLedsArray(ledIcons);
+  ledClock.attachTimeUpdateFunction(updateTime);
+  updateTime();
+  //ledClock.setCurTime(1,8,58,33);
   ledClock.setCurentIndoorTemperature(23);
   ledClock.setCurentOutdoorTemperature(-15);
   
   
 
-  ledClock.setCurTime(1,1,10,0);
+  
  // ledClock.outdoorStats.putCurrentTemperature(1510,1,10,-25.0);
-  ledClock.setCurentOutdoorTemperature(-15);
+  
   delay(1000);
-  ledClock.setCurTime(1,1,11,0);
-  ledClock.setCurentOutdoorTemperature(-12);
+  updateTime();
+  ledClock.setCurentOutdoorTemperature(-15);
+  ledClock.setCurentIndoorTemperature(23);
  
    switchModeButton.attachClick( clickSwitchMenu);
    statsButton.attachClick(clickStatsButton);
@@ -128,10 +136,8 @@ void loop() {
   //ledClock.drowMinutes(88,SUB_ZERO);
 
   //ledClock.drowTemperatureOnDispley(-35);
-  ledClock.renderIcons(ledIcons);
-  ledClock.render(leds);
-  
- 
+  //ledClock.renderIcons(ledIcons);
+  ledClock.render();
   
   
 

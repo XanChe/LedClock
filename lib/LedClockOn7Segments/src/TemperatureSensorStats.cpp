@@ -7,15 +7,15 @@ TemperatureSensorStats::TemperatureSensorStats(icons ic)
 {
     icon = ic;
     for(byte i; i <24; i++){
-        maxTemperatureStatsArray[i] = -200.0;
-        minTemperatureStatsArray[i] = 1500;
+        maxTemperatureStatsArray[i] = -120;
+        minTemperatureStatsArray[i] = 120;
     }
 }
 
-void TemperatureSensorStats::putCurrentTemperature(unsigned long dateTimeInMinutes, byte hour, byte minute, float temperature){
+void TemperatureSensorStats::putCurrentTemperature(unsigned long dateTimeInMinutes, byte hour, byte minute, char temperature){
 
     
-    if(temperature<1000.0 && temperature >-150.0){
+    if(temperature<120 && temperature >-120){
         lastDataCommit = dateTimeInMinutes;
         currentTmeperature = temperature;
     }
@@ -31,7 +31,7 @@ void TemperatureSensorStats::putCurrentTemperature(unsigned long dateTimeInMinut
 }
 
 int TemperatureSensorStats::getMaxtemperature(){
-    float maxT = -200.0;
+    char maxT = -120;
     for(byte i = 0; i<24; i++){
         maxT = max(maxT, maxTemperatureStatsArray[i]);
     }
@@ -39,7 +39,7 @@ int TemperatureSensorStats::getMaxtemperature(){
 }
 
 int TemperatureSensorStats::getMintemperature(){
-    float minT = 1500;
+    char minT = 120;
     for(byte i = 0; i<24; i++){
         minT = min(minT, minTemperatureStatsArray[i]);
     }

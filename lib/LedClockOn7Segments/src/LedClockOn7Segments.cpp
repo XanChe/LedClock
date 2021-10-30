@@ -33,10 +33,10 @@ void LedClockOn7Segments::tick(){
     
     switch (cronCounter % 20){
     case 1:
-        clearDispley();
-        clearIcons();
+        
+        //cronCounter++;
         break;
-    case 3:
+    case 19:
         drowCurentState();
         cronCounter++;
         break; 
@@ -55,17 +55,27 @@ void LedClockOn7Segments::tick(){
 }
 
 void LedClockOn7Segments::drowCurentState(){
+    clearDispley();
+    clearIcons();
     switch (clockState.getClockState())
     {
+    case MENU_HOUR:
+        
+        drowTimeOnDispley();
+        break;
     case CUR_TIME:
         drowTimeOnDispley();
         break;
     case CUR_T_OUTDOOR:
-        drowTemperatureIfCan(ledClock.outdoorStats);        
-        break;
+        if(drowTemperatureIfCan(ledClock.outdoorStats)){
+            break;
+        }        
+        
     case CUR_T_INDOOR:
-        drowTemperatureIfCan(ledClock.indoorStats);        
-        break;
+        if(drowTemperatureIfCan(ledClock.indoorStats)){
+            break;
+        }        
+        
     
     default:
         drowTimeOnDispley();
@@ -73,11 +83,18 @@ void LedClockOn7Segments::drowCurentState(){
     }
 }
 
-void LedClockOn7Segments::setTimeUpdateCallbackFunction(void (*func)()){
+void LedClockOn7Segments::attachTimeUpdateFunction(void (*func)()){
     timeUpdateCallbackFunction = func;
 }
 
-void LedClockOn7Segments::assignFastLED(CFastLED fLED){
+void LedClockOn7Segments::attachMainLedsArray(CRGB lesArray[]){
+    mainLedsArray = lesArray;
+}
+void LedClockOn7Segments::attachIconLedsArray(CRGB lesArray[]){
+    iconLedsArray = lesArray;
+}
+
+void LedClockOn7Segments::assignFastLED(CFastLED &fLED){
     CurFastLED = fLED;
 }
 
@@ -95,13 +112,11 @@ void LedClockOn7Segments::clearDispley(){
     drowLedSegment(ledMain, 0, NUM_LEDS, CRGB::Black, OFF, false);    
 }
 
-void LedClockOn7Segments::clearIcons(){
-     isIconsModifyded = true;
+void LedClockOn7Segments::clearIcons(){     
     drowLedSegment(ledIcons, 0, NUM_ICON_LEDS, CRGB::Black, OFF, false);    
 }
 
-void LedClockOn7Segments::drowIcon(icons icon){
-    isIconsModifyded = true;
+void LedClockOn7Segments::drowIcon(icons icon){    
     switch (icon)
     {
     case icons::INDOOR_T:
@@ -142,18 +157,19 @@ void LedClockOn7Segments::drowLedSegment(LedPixel ledArray[], byte start, byte c
         }
 }
 
-void LedClockOn7Segments::drowTemperatureIfCan(TemperatureSensorStats tStats){
+bool LedClockOn7Segments::drowTemperatureIfCan(TemperatureSensorStats tStats){
     if(tStats.canBeShowed(curentDateTimeInMinutes)){
         drowTemperatureOnDispley(tStats.getCurentTemperature());
         drowIcon(tStats.getIcon());
+        return true;
     }else{
         clockState.changeStateTo(CUR_TIME);
+        return false;
     }
 }
 
 void LedClockOn7Segments::drowTemperatureOnDispley(int temperature){
     clearDispley();
-    isDisplayModifyded = true;
     int templ = abs(temperature) / 10;
     int tempr = abs(temperature) % 10;    
     
@@ -201,9 +217,7 @@ void LedClockOn7Segments::drowMinutes(byte minutes, showingLedEffects effect){
     drowNumber(SEGMENT_LED_COUNT*7, minutes / 10, effect);
 }
 
-void LedClockOn7Segments::drowNumber(int startindex, byte number, showingLedEffects effect){    
-    isDisplayModifyded = true; 
-
+void LedClockOn7Segments::drowNumber(int startindex, byte number, showingLedEffects effect){ 
     CRGB segmentColor = CRGB::Black;
     int z = 0;
     for (int i = 0; i < 7; i++) {
@@ -214,31 +228,33 @@ void LedClockOn7Segments::drowNumber(int startindex, byte number, showingLedEffe
   }
 }
 
-
-void LedClockOn7Segments::render(CRGB displayLed[]){
+void LedClockOn7Segments::render(){
     if(cronCounter % 10 == 0 ){
-        //Serial.println(cronCounter);
-        for(int i = 0; i < NUM_LEDS; i++){            
-            displayLed[i] = applyPixelEffect(ledMain[i]);
+        if(iconLedsArray != NULL) {
+            renderIcons(iconLedsArray);
         }
-        isDisplayModifyded = false;
+        if(mainLedsArray != NULL){
+            render(mainLedsArray);
+        }
         CurFastLED.setBrightness( 20 );
         CurFastLED.show();
         cronCounter++;
     }
-    
 }
 
-void LedClockOn7Segments::renderIcons(CRGB displayLed[]){
-    if(cronCounter % 10 == 5){
+void LedClockOn7Segments::render(CRGB displayLed[]){
+    
+        //Serial.println(cronCounter);
+        for(int i = 0; i < NUM_LEDS; i++){            
+            displayLed[i] = applyPixelEffect(ledMain[i]);       
+        }
+        
+}
+
+void LedClockOn7Segments::renderIcons(CRGB displayLed[]){  
         for(int i = 0; i < NUM_ICON_LEDS; i++){
             displayLed[i] = applyPixelEffect(ledIcons[i]);
-        }
-        isIconsModifyded = false;
-       // CurFastLED.setBrightness( 12 );
-        //CurFastLED.show();   
-        cronCounter++;
-    }    
+        }           
 }
 
 
@@ -273,15 +289,15 @@ CRGB LedClockOn7Segments::applyPixelEffect(LedPixel ledPixel){
     
 }
 
-void LedClockOn7Segments::setCurentIndoorTemperature(float t){
+void LedClockOn7Segments::setCurentIndoorTemperature(char t){
     setCurentTemperature(indoorStats, t);
 }
 
-void LedClockOn7Segments::setCurentOutdoorTemperature(float t){
+void LedClockOn7Segments::setCurentOutdoorTemperature(char t){
     setCurentTemperature(outdoorStats, t);
 }
 
-void LedClockOn7Segments::setCurentTemperature(TemperatureSensorStats &tStats, float t){
+void LedClockOn7Segments::setCurentTemperature(TemperatureSensorStats &tStats, char t){
     tStats.putCurrentTemperature(curentDateTimeInMinutes, curentHour, curentMinute, t);
 }
 

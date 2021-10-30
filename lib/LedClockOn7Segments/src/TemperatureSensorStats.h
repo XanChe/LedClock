@@ -10,14 +10,14 @@ private:
     unsigned long lastDataCommit = 0;
     bool isValide = true;
     icons icon;
-    float currentTmeperature = -200.0;
-    float maxTemperatureStatsArray[24]; 
-    float minTemperatureStatsArray[24]; 
+    float currentTmeperature = -120;
+    char maxTemperatureStatsArray[24]; 
+    char minTemperatureStatsArray[24]; 
 
 public:
     TemperatureSensorStats(icons ic);
     
-    void putCurrentTemperature(unsigned long dateTimeInMinutes, byte hour, byte minute, float temperature);
+    void putCurrentTemperature(unsigned long dateTimeInMinutes, byte hour, byte minute, char temperature);
     int getMaxtemperature();
     int getMintemperature();
     int getCurentTemperature();
