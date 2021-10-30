@@ -32,9 +32,13 @@ void LedClockOn7Segments::tick(){
     }    
     
     switch (cronCounter % 20){
-    case 1:
-        
-        //cronCounter++;
+    case 0: //Зпрос датчика температуры
+        if(*requestTempCallbackFunction!=NULL)requestTempCallbackFunction();
+        cronCounter++;
+        break;
+    case 1: //Через чуть-менее секунды - получить ответ
+        if(*getAnswerTempCallbackFunction!=NULL)getAnswerTempCallbackFunction();
+        cronCounter++;
         break;
     case 19:
         drowCurentState();
@@ -86,7 +90,12 @@ void LedClockOn7Segments::drowCurentState(){
 void LedClockOn7Segments::attachTimeUpdateFunction(void (*func)()){
     timeUpdateCallbackFunction = func;
 }
-
+void LedClockOn7Segments::attachRequestTempFunction(void (*func)()){
+    requestTempCallbackFunction = func;
+}
+void LedClockOn7Segments::attachGetAnswerTempFunction(void (*func)()){
+    getAnswerTempCallbackFunction = func;
+}
 void LedClockOn7Segments::attachMainLedsArray(CRGB lesArray[]){
     mainLedsArray = lesArray;
 }

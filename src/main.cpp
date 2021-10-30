@@ -1,12 +1,15 @@
 #define FASTLED_ALLOW_INTERRUPTS 1
 #define FASTLED_INTERRUPT_RETRY_COUNT 1
 #include <LedClockOn7Segments.h>
-
+#include <math.h>
 #include <Wire.h> // must be included here so that Arduino library object file references work
 #include <RTClib.h>
 #include <OneButton.h>
-
+#define DS_TEMP_TYPE float
+#include <microDS18B20.h>
 RTC_DS3231 rtc;
+
+MicroDS18B20<12> sensor;
 
 CRGBArray<NUM_LEDS> leds;
 CRGBArray<NUM_ICON_LEDS> ledIcons;
@@ -25,6 +28,15 @@ void updateTime(){
   
 }
 
+void requestTemp(){
+  sensor.requestTemp();
+}
+
+void getAnswerTemp(){
+ 
+ 
+  Serial.println(round(sensor.getTemp()));
+}
 void start_clockDS3231(){
   
   if (! rtc.begin()) {
@@ -105,6 +117,8 @@ void setup() {
   ledClock.attachMainLedsArray(leds);
   ledClock.attachIconLedsArray(ledIcons);
   ledClock.attachTimeUpdateFunction(updateTime);
+  ledClock.attachRequestTempFunction(requestTemp);
+  ledClock.attachGetAnswerTempFunction(getAnswerTemp);
   updateTime();
   //ledClock.setCurTime(1,8,58,33);
   ledClock.setCurentIndoorTemperature(23);

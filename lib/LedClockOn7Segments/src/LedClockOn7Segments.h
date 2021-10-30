@@ -46,6 +46,8 @@ class LedClockOn7Segments{
         unsigned long cronCounter = 0;      
 
         void (*timeUpdateCallbackFunction)();
+        void (*requestTempCallbackFunction)();
+        void (*getAnswerTempCallbackFunction)();
 
         unsigned long mil =0;
 
@@ -53,7 +55,7 @@ class LedClockOn7Segments{
 
         ClockState clockState = ClockState(CUR_TIME);
        // clockStates state = CUR_T_OUTDOOR;
-        ClockMenu 
+        ClockMenu *menu;
 
         LedPixel ledIcons[NUM_ICON_LEDS];
         LedPixel ledMain[NUM_LEDS];  
@@ -91,6 +93,8 @@ class LedClockOn7Segments{
         
         void assignFastLED(CFastLED &fLED);  
         void attachTimeUpdateFunction(void (*func)());
+        void attachRequestTempFunction(void (*func)());
+        void attachGetAnswerTempFunction(void (*func)());
         void attachMainLedsArray(CRGB lesArray[]);
         void attachIconLedsArray(CRGB lesArray[]);
 
