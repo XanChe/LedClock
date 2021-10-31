@@ -17,8 +17,6 @@ private:
 
     clockStates menuState = MENU_HOUR;
     /* data */
-public:
-    ClockMenu(byte lHour, byte lMinute, CHSV lClockColor, CHSV lSubZeroColor, CHSV lPlusZeroColor);
     void decreaseHour();
     void increaseHour();
     void decreaseMinute();
@@ -27,6 +25,14 @@ public:
     void increaseColor(CHSV &color);
     void decreaseBrightness();
     void increaseBrightness();
+
+public:
+    ClockMenu(byte lHour, byte lMinute, CHSV lClockColor, CHSV lSubZeroColor, CHSV lPlusZeroColor);
+    
+    void increseValue();
+    void decreaseValue();
+    clockStates nextMenu();
+    clockStates currentMenu();
 };
 
 

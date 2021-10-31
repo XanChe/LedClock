@@ -6,6 +6,11 @@ enum clockStates {
     CUR_T_INDOOR,
     MENU_MINUTES,
     MENU_HOUR,
+    MENU_COLOR,
+    MENU_SUB_COLOR,
+    MENU_PLUS_COLOR,
+    MENU_BRIGHTNESS,
+    MENU_SAVE,
 };
 
 enum showingLedEffects {

@@ -341,13 +341,22 @@ void LedClockOn7Segments::statsButtonClick(){
     //TODO:
 }
 void LedClockOn7Segments::menuButtonClick(){
-    clockState.changeStateTo(MENU_HOUR);
+    if(menu == NULL){
+        menu = new ClockMenu(this->curentHour, this->curentMinute, this->clockColor, this->subZeroColor, this->plusZeroColor);
+        clockState.changeStateTo(MENU_HOUR, 30);
+    }
+    
 }
 void LedClockOn7Segments::menuNextButtonClick(){
-    //TODO:
+    if(menu != NULL){
+        clockState.changeStateTo(menu->nextMenu(), 30);      
+    }
 }
 void LedClockOn7Segments::menuPlusButtonClick(){
-    //TODO:
+    if(menu != NULL){
+        clockState.changeStateTo(menu->currentMenu(), 30);
+       menu->increseValue();      
+    }
 }
 void LedClockOn7Segments::menuMinusButtonClick(){
    //TODO:
