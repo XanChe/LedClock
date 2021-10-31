@@ -2,7 +2,6 @@
 #define ClockState_h
 #include <Arduino.h>
 #include <LibEnums.h>
-
 class ClockState
 {
 private:
@@ -13,7 +12,7 @@ public:
     ClockState(clockStates st);
     void changeStateTo(clockStates st, byte worckDuration = 15);
     bool equals(clockStates st);
-    void changeNextAvailable();
+    clockStates changeNextAvailable();
     clockStates getClockState();
 };
 

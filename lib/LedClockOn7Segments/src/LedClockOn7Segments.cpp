@@ -32,22 +32,28 @@ void LedClockOn7Segments::tick(){
     }    
     
     switch (cronCounter % 20){
-    case 0: //Зпрос датчика температуры
-        if(*requestTempCallbackFunction!=NULL)requestTempCallbackFunction();
-        cronCounter++;
+    case 1: //Зпрос датчика температуры
+        if(*requestTempCallbackFunction!=NULL && cronCounter>=1200){
+            requestTempCallbackFunction();
+            cronCounter++;
+        }
         break;
-    case 1: //Через чуть-менее секунды - получить ответ
-        if(*getAnswerTempCallbackFunction!=NULL)getAnswerTempCallbackFunction();
-        cronCounter++;
+    case 18: //Через чуть-менее секунды - получить ответ
+        if(*getAnswerTempCallbackFunction!=NULL && cronCounter>=1200){
+            getAnswerTempCallbackFunction();
+            cronCounter = 18;
+        }
         break;
-    case 19:
+    case 0:
         drowCurentState();
         cronCounter++;
         break; 
+   
     case 5:
         if(*timeUpdateCallbackFunction!=NULL)timeUpdateCallbackFunction(); 
         cronCounter++;
         break;
+    
     default:
         
         break;   
@@ -310,8 +316,26 @@ void LedClockOn7Segments::setCurentTemperature(TemperatureSensorStats &tStats, c
     tStats.putCurrentTemperature(curentDateTimeInMinutes, curentHour, curentMinute, t);
 }
 
+bool LedClockOn7Segments::checkStateAvailable(clockStates st){
+    switch (st)
+    {
+    case CUR_TIME:
+        return true;
+        break;
+    case CUR_T_INDOOR:
+        return indoorStats.canBeShowed(curentDateTimeInMinutes);
+        break;
+    case CUR_T_OUTDOOR:
+        return outdoorStats.canBeShowed(curentDateTimeInMinutes);
+    
+    default:
+        return false;
+        break;
+    }
+}
+
 void LedClockOn7Segments::switchModeButtonClick(){
-    clockState.changeNextAvailable();
+    while(!checkStateAvailable(clockState.changeNextAvailable()));
 }
 void LedClockOn7Segments::statsButtonClick(){
     //TODO:

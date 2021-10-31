@@ -7,13 +7,13 @@ ClockState::ClockState(clockStates st)
     changeStateTo(st);
 }
 
-void ClockState::changeNextAvailable(){
+clockStates ClockState::changeNextAvailable(){
     
     Serial.println(state);
     switch (state)
     {
     case CUR_TIME:
-        changeStateTo(CUR_T_OUTDOOR);
+        changeStateTo(CUR_T_OUTDOOR);        
         break;
     case CUR_T_OUTDOOR:
         changeStateTo(CUR_T_INDOOR);
@@ -25,6 +25,9 @@ void ClockState::changeNextAvailable(){
     default:
         break;
     }
+    return state;
+   
+
 }
 
 void ClockState::changeStateTo(clockStates st, byte worckDuration){

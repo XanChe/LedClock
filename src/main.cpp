@@ -1,5 +1,5 @@
-#define FASTLED_ALLOW_INTERRUPTS 1
-#define FASTLED_INTERRUPT_RETRY_COUNT 1
+#define FASTLED_ALLOW_INTERRUPTS 0
+
 #include <LedClockOn7Segments.h>
 #include <math.h>
 #include <Wire.h> // must be included here so that Arduino library object file references work
@@ -7,6 +7,10 @@
 #include <OneButton.h>
 #define DS_TEMP_TYPE float
 #include <microDS18B20.h>
+#include <Gyver433.h>
+
+//Gyver433_RX<2, 20> rx;
+
 RTC_DS3231 rtc;
 
 MicroDS18B20<12> sensor;
@@ -19,6 +23,7 @@ OneButton statsButton(10, true);
 
 
 
+
 void updateTime(){
   /*RtcDateTime now = Rtc.GetDateTime(); 
   
@@ -27,15 +32,21 @@ void updateTime(){
   ledClock.setCurTime((byte)now.day(), (byte)now.hour(), (byte)now.minute(), (byte)now.second());
   
 }
-
+unsigned long mm =0;
 void requestTemp(){
+  mm = millis();
   sensor.requestTemp();
+  Serial.print(1);
+  Serial.print(" \t");
+
 }
 
 void getAnswerTemp(){
  
- 
-  Serial.println(round(sensor.getTemp()));
+  /*Serial.print((millis() - mm));
+  Serial.print(" \t");*/
+  ledClock.setCurentIndoorTemperature(round(sensor.getTemp()));
+  Serial.println(sensor.getTemp());
 }
 void start_clockDS3231(){
   
@@ -55,44 +66,6 @@ void start_clockDS3231(){
     // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
   }
   
-  /*
-  Rtc.Begin();
-
-    RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
-    
-    Serial.println();
-
-    if (!Rtc.IsDateTimeValid()) 
-    {
-        if (Rtc.LastError() != 0)
-        {
-            // we have a communications error
-            // see https://www.arduino.cc/en/Reference/WireEndTransmission for 
-            // what the number means
-            Serial.print("RTC communications error = ");
-            Serial.println(Rtc.LastError());
-        }
-        else
-        {
-            // Common Causes:
-            //    1) first time you ran and the device wasn't running yet
-            //    2) the battery on the device is low or even missing
-
-            Serial.println("RTC lost confidence in the DateTime!");
-
-            // following line sets the RTC to the date & time this sketch was compiled
-            // it will also reset the valid flag internally unless the Rtc device is
-            // having an issue
-
-            Rtc.SetDateTime(compiled);
-        }
-    }
-
-    if (!Rtc.GetIsRunning())
-    {
-        Serial.println("RTC was not actively running, starting now");
-        Rtc.SetIsRunning(true);
-    }*/
 }
 void clickSwitchMenu(){
   Serial.println("CLick1");
@@ -102,11 +75,19 @@ void clickStatsButton(){
   Serial.println("CLick Stats");
   ledClock.menuButtonClick();
 }
+// тикер вызывается в прерывании
+void isr() {
+ // rx.tickISR();
+}
+
 void setup() {
   Serial.begin(9600);
   
   start_clockDS3231();
-  
+  sensor.setResolution(11);
+  //attachInterrupt(0, isr, CHANGE);
+
+
   FastLED.addLeds<WS2811, DATA_PIN, GRB>(leds, NUM_LEDS);
   FastLED.addLeds<WS2811, DATA_ICON_PIN, GRB>(ledIcons, NUM_ICON_LEDS);
   FastLED.setBrightness( 15 );
@@ -122,7 +103,7 @@ void setup() {
   updateTime();
   //ledClock.setCurTime(1,8,58,33);
   ledClock.setCurentIndoorTemperature(23);
-  ledClock.setCurentOutdoorTemperature(-15);
+  //ledClock.setCurentOutdoorTemperature(-15);
   
   
 
@@ -131,7 +112,7 @@ void setup() {
   
   delay(1000);
   updateTime();
-  ledClock.setCurentOutdoorTemperature(-15);
+  //ledClock.setCurentOutdoorTemperature(-15);
   ledClock.setCurentIndoorTemperature(23);
  
    switchModeButton.attachClick( clickSwitchMenu);
@@ -140,7 +121,18 @@ void setup() {
 }
 
 void loop() {
- 
+ /*if (rx.gotData()) {   // если больше 0    
+    // ЧИТАЕМ. СПОСОБ 1
+    // я знаю, что передатчик отправляет char[15]
+    char data;
+    
+    // читаем принятые данные в data
+    // если данные совпадают по размеру - ок
+    if (rx.readData(data)) Serial.print(data);
+    else Serial.print("Data error");
+
+    
+  }*/
   switchModeButton.tick();
   statsButton.tick();
  

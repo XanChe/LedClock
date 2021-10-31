@@ -79,7 +79,7 @@ class LedClockOn7Segments{
         bool drowTemperatureIfCan(TemperatureSensorStats tStats);
 
         void drowCurentState();
-
+        
        // CRGB applyEffectsToDisplayLedByIndex(byte i);
         CRGB applyPixelEffect(LedPixel ledPixel);
         
@@ -90,7 +90,7 @@ class LedClockOn7Segments{
         TemperatureSensorStats outdoorStats = TemperatureSensorStats(OUTDOOR_T);
         TemperatureSensorStats indoorStats = TemperatureSensorStats(INDOOR_T);
         
-        
+        bool checkStateAvailable(clockStates st);
         void assignFastLED(CFastLED &fLED);  
         void attachTimeUpdateFunction(void (*func)());
         void attachRequestTempFunction(void (*func)());
