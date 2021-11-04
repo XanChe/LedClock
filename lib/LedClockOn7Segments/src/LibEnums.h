@@ -20,6 +20,7 @@ enum showingLedEffects {
     OFF,
     SUB_ZERO,
     PLUS_ZERO,
+    CUSTOM_COLOR,
 };
 
 enum icons {

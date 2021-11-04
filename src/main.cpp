@@ -4,11 +4,20 @@
 #include <math.h>
 #include <Wire.h> // must be included here so that Arduino library object file references work
 #include <RTClib.h>
-#include <OneButton.h>
+//#include <OneButton.h>
 #define DS_TEMP_TYPE float
 #include <microDS18B20.h>
 #include <Gyver433.h>
 
+#define CLK 5
+#define DT 4
+#define SW 6
+#define DATA_PIN 8
+#define DATA_ICON_PIN 7
+
+#include <GyverEncoder.h>
+//Encoder enc1(CLK, DT);      // для работы без кнопки
+Encoder enc1(CLK, DT, SW); 
 //Gyver433_RX<2, 20> rx;
 
 RTC_DS3231 rtc;
@@ -17,21 +26,22 @@ MicroDS18B20<12> sensor;
 
 CRGBArray<NUM_LEDS> leds;
 CRGBArray<NUM_ICON_LEDS> ledIcons;
-
+/*
 OneButton switchModeButton(9, true);
-OneButton statsButton(10, true);
+OneButton statsButton(10, true);*/
 
 
 
 
 void updateTime(){
-  /*RtcDateTime now = Rtc.GetDateTime(); 
-  
-  ledClock.setCurTime((byte)now.Day(), (byte)now.Hour(), (byte)now.Minute(), (byte)now.Second());*/
   DateTime now = rtc.now();
-  ledClock.setCurTime((byte)now.day(), (byte)now.hour(), (byte)now.minute(), (byte)now.second());
-  
+  ledClock.setCurTime((byte)now.day(), (byte)now.hour(), (byte)now.minute(), (byte)now.second());  
 }
+
+void saveTime(byte hour, byte minute, byte second){
+  rtc.adjust(DateTime(2020,11,3,hour,minute,second));
+}
+
 unsigned long mm =0;
 void requestTemp(){
   mm = millis();
@@ -86,7 +96,7 @@ void setup() {
   start_clockDS3231();
   sensor.setResolution(11);
   //attachInterrupt(0, isr, CHANGE);
-
+   enc1.setType(TYPE2);
 
   FastLED.addLeds<WS2811, DATA_PIN, GRB>(leds, NUM_LEDS);
   FastLED.addLeds<WS2811, DATA_ICON_PIN, GRB>(ledIcons, NUM_ICON_LEDS);
@@ -94,29 +104,25 @@ void setup() {
   FastLED.setTemperature( TEMPERATURE_1 );
   FastLED.setMaxPowerInVoltsAndMilliamps(5, 500);
 
-  ledClock.assignFastLED(FastLED);
+  ledClock.attachFastLED(FastLED);
   ledClock.attachMainLedsArray(leds);
   ledClock.attachIconLedsArray(ledIcons);
-  ledClock.attachTimeUpdateFunction(updateTime);
+  ledClock.attachGetTimeFunction(updateTime);
   ledClock.attachRequestTempFunction(requestTemp);
   ledClock.attachGetAnswerTempFunction(getAnswerTemp);
   updateTime();
   //ledClock.setCurTime(1,8,58,33);
   ledClock.setCurentIndoorTemperature(23);
   //ledClock.setCurentOutdoorTemperature(-15);
-  
-  
-
-  
- // ledClock.outdoorStats.putCurrentTemperature(1510,1,10,-25.0);
+ 
   
   delay(1000);
   updateTime();
   //ledClock.setCurentOutdoorTemperature(-15);
   ledClock.setCurentIndoorTemperature(23);
- 
+ /*
    switchModeButton.attachClick( clickSwitchMenu);
-   statsButton.attachClick(clickStatsButton);
+   statsButton.attachClick(clickStatsButton);*/
   // put your setup code here, to run once:
 }
 
@@ -133,17 +139,15 @@ void loop() {
 
     
   }*/
-  switchModeButton.tick();
-  statsButton.tick();
- 
+  enc1.tick();
+  if(enc1.isRight())  ledClock.menuPlusButtonClick();
+  if(enc1.isLeft())   ledClock.menuMinusButtonClick();
+  if(enc1.isHolded()) ledClock.menuButtonClick();
+  if(enc1.isSingle())  ledClock.menuNextButtonClick();
+  /*switchModeButton.tick();
+  statsButton.tick();*/
   
   ledClock.tick();
-  //ledClock.drowHour(88,PLUS_ZERO);
-  //ledClock.drowMinutes(88,SUB_ZERO);
-
-  //ledClock.drowTemperatureOnDispley(-35);
-  //ledClock.renderIcons(ledIcons);
-  ledClock.render();
   
   
 

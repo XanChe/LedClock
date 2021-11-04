@@ -33,6 +33,27 @@ public:
     void decreaseValue();
     clockStates nextMenu();
     clockStates currentMenu();
+
+    CHSV getClockColor(){
+        return clockColor;
+    }
+    CHSV getSubZeroColor(){
+        return subZeroColor;
+    }
+    CHSV getPlusZeroColor(){
+        return plusZeroColor;
+    }
+    byte getHour(){
+        return hour;
+    }
+    byte getMinute(){
+        return minute;
+    }
+    byte getBtightness(){
+        return brightness;
+    }
+    
+    CHSV getCurrentColor();
 };
 
 

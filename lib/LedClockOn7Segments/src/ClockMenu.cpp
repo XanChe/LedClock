@@ -108,14 +108,15 @@ void ClockMenu::increaseMinute(){
     if(++minute > 59) minute = 0;
 }
 void ClockMenu::decreaseColor(CHSV &color){
-    int8_t hue = color.hue;
-    if(--hue < 0) hue = 360;
-    color.hue = hue;    
+    int hue = color.hue;
+    if(--hue < 0) hue = 192;
+    color = CHSV(hue, 255, 255);   
 }
 void ClockMenu::increaseColor(CHSV &color){
-    int8_t hue = color.hue;
-    if(++hue > 360) hue = 0;
-    color.hue = hue;
+    int hue = color.hue;
+    if(++hue > 192) hue = 0;
+    Serial.println(hue);
+    color = CHSV(hue, 255, 255);
 }
 void ClockMenu::decreaseBrightness(){
     if(brightness > 15) brightness--;
@@ -123,3 +124,29 @@ void ClockMenu::decreaseBrightness(){
 void ClockMenu::increaseBrightness(){
     if(brightness < 255) brightness++;
 }
+
+CHSV ClockMenu::getCurrentColor(){
+        switch (menuState)
+        {
+        case MENU_HOUR:
+            return clockColor;
+            break;
+        case MENU_MINUTES:
+            return clockColor;
+            break;
+        case MENU_COLOR:
+            return clockColor;
+            break;
+        case MENU_PLUS_COLOR:
+            return plusZeroColor;
+            break;
+        case MENU_SUB_COLOR:
+            return subZeroColor;
+            break;
+        
+        default:
+            return clockColor;
+            break;
+        }
+}
+
