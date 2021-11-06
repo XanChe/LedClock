@@ -5,6 +5,7 @@
 class ClockState
 {
 private:
+    
     clockStates state;
     unsigned long stateStartMilles = 0;
     byte workPeriodInSeconds = 15;

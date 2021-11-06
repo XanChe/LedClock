@@ -3,18 +3,15 @@
 #include <Arduino.h>
 #include <LibEnums.h>
 #include <FastLED.h>
+#include <Tytedefs.h>
 
 class ClockMenu
 {
 private:
     byte hour;
-    byte minute;
-    byte brightness = 50;
+    byte minute;      
 
-    CHSV subZeroColor = CHSV(HUE_BLUE, 255, 255);
-    CHSV plusZeroColor = CHSV(HUE_ORANGE, 255, 255);
-    CHSV clockColor = CHSV(HUE_GREEN, 255, 255);
-
+    DisplaySettings settings;
     clockStates menuState = MENU_HOUR;
     /* data */
     void decreaseHour();
@@ -27,14 +24,15 @@ private:
     void increaseBrightness();
 
 public:
-    ClockMenu(byte lHour, byte lMinute, CHSV lClockColor, CHSV lSubZeroColor, CHSV lPlusZeroColor);
+    
+    ClockMenu(DisplaySettings settings);
     
     void increseValue();
     void decreaseValue();
     clockStates nextMenu();
     clockStates currentMenu();
-
-    CHSV getClockColor(){
+    
+    /*CHSV getClockColor(){
         return clockColor;
     }
     CHSV getSubZeroColor(){
@@ -42,18 +40,18 @@ public:
     }
     CHSV getPlusZeroColor(){
         return plusZeroColor;
-    }
+    }*/
     byte getHour(){
         return hour;
     }
     byte getMinute(){
         return minute;
-    }
-    byte getBtightness(){
-        return brightness;
-    }
+    }    
     
-    CHSV getCurrentColor();
+  //  CHSV getCurrentColor();
+    DisplaySettings getSettings(){
+        return settings;
+    }
 };
 
 

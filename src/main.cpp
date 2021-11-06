@@ -92,8 +92,9 @@ void isr() {
 
 void setup() {
   Serial.begin(9600);
-  
-  start_clockDS3231();
+  Serial.println("Start clock");
+  //start_clockDS3231();
+  Serial.println("Harware enabled");
   sensor.setResolution(11);
   //attachInterrupt(0, isr, CHANGE);
    enc1.setType(TYPE2);
@@ -107,7 +108,7 @@ void setup() {
   ledClock.attachFastLED(FastLED);
   ledClock.attachMainLedsArray(leds);
   ledClock.attachIconLedsArray(ledIcons);
-  ledClock.attachGetTimeFunction(updateTime);
+  //ledClock.attachGetTimeFunction(updateTime);
   ledClock.attachRequestTempFunction(requestTemp);
   ledClock.attachGetAnswerTempFunction(getAnswerTemp);
   updateTime();

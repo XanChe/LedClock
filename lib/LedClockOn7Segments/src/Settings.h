@@ -1,3 +1,5 @@
+#ifndef Settings_h
+#define Settings_h
 #include <Arduino.h>
 #include <EEPROM.h>
 class Settings
@@ -33,7 +35,7 @@ public:
 
     }   
     void save(){
-        EEPROMWriteInt(0,27597532);
+        EEPROMWriteInt(0,27575);
         EEPROMWriteInt(2,clockColorHue);
         EEPROMWriteInt(4,subZeroColorHue);
         EEPROMWriteInt(6,plusZeroColorHue);
@@ -41,7 +43,7 @@ public:
 
     }
     void load(){
-        if(EEPROMReadInt(0) == 27597532){
+        if(EEPROMReadInt(0) == 27575){
             this->clockColorHue =  EEPROMReadInt(2);
             this->subZeroColorHue = EEPROMReadInt(4);
             this->plusZeroColorHue = EEPROMReadInt(6);
@@ -65,3 +67,4 @@ public:
     }
 };
 
+#endif
