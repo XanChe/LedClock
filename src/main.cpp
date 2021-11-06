@@ -111,16 +111,16 @@ void setup() {
   //ledClock.attachGetTimeFunction(updateTime);
   ledClock.attachRequestTempFunction(requestTemp);
   ledClock.attachGetAnswerTempFunction(getAnswerTemp);
-  updateTime();
+ // updateTime();
   //ledClock.setCurTime(1,8,58,33);
-  ledClock.setCurentIndoorTemperature(23);
+ // ledClock.setCurentIndoorTemperature(23);
   //ledClock.setCurentOutdoorTemperature(-15);
  
   
   delay(1000);
-  updateTime();
+  //updateTime();
   //ledClock.setCurentOutdoorTemperature(-15);
-  ledClock.setCurentIndoorTemperature(23);
+ // ledClock.setCurentIndoorTemperature(23);
  /*
    switchModeButton.attachClick( clickSwitchMenu);
    statsButton.attachClick(clickStatsButton);*/

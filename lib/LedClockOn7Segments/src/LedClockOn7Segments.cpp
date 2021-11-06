@@ -54,14 +54,14 @@ void LedClockOn7Segments::drowMenuState(){
     switch (menu->currentMenu())
     {
     case MENU_HOUR:                
-        display.drowMenuTimeOnDispley(curentHour, curentMinute, state);
+        display.drowMenuTimeOnDispley(menu->getHour(), menu->getMinute(), state);
         
         break;
     case MENU_MINUTES:
-        display.drowMenuTimeOnDispley(curentHour, curentMinute, state);
+        display.drowMenuTimeOnDispley(menu->getHour(), menu->getMinute(), state);
         break;
     case MENU_COLOR:
-        display.drowTimeOnDispley(curentHour, curentMinute);
+        display.drowTimeOnDispley(menu->getHour(), menu->getMinute());
         display.drowColorPallete(menu->getSettings().clockColor.hue);        
         break;
     case MENU_PLUS_COLOR:        
@@ -251,8 +251,8 @@ void LedClockOn7Segments::statsButtonClick(){
 void LedClockOn7Segments::menuButtonClick(){
     Serial.println("MenuCLick");
     if(menu == NULL){
-       /* menu = new ClockMenu(displaySettings);
-        changeStateTo(MENU_HOUR, 30);*/
+        menu = new ClockMenu(displaySettings);
+        changeStateTo(MENU_HOUR, 30);
     }else{
         //saveMenu(menu);
     }
@@ -270,7 +270,7 @@ void LedClockOn7Segments::menuNextButtonClick(){
             curentHour = menu->getHour();
             curentMinute = menu->getMinute();
             curentSecond = 0;
-            setHardwareClockTo(curentHour, curentMinute, curentSecond);
+            //setHardwareClockTo(curentHour, curentMinute, curentSecond);
             displaySettings = menu->getSettings();
             delete menu;
             saveSettings(displaySettings);

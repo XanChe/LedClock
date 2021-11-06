@@ -37,7 +37,7 @@ void ClockDisplay::fillNubreByColorPallete(byte start, byte colorIndex, CRGB col
 
 }
 void ClockDisplay::drowColorPallete(int8_t hue){
-/*
+
     byte gradientLen = 9 + SEGMENT_LED_COUNT * 4;
     fill_gradient(mainLedsArray, 0, CHSV(hue - 1, 255, 255), gradientLen , CHSV(hue + 1, 255, 255), TGradientDirectionCode::LONGEST_HUES);
     fillNubreByColorPallete(0, 0, mainLedsArray);
@@ -46,7 +46,7 @@ void ClockDisplay::drowColorPallete(int8_t hue){
     fillColorToLedSegment(ledMain,SEGMENT_LED_COUNT * 7 * 2,  DOTES_LED_COUNT, mainLedsArray[(SEGMENT_LED_COUNT * 2 + 4)]);
 
     fillNubreByColorPallete(SEGMENT_LED_COUNT * 7 * 2 + DOTES_LED_COUNT, SEGMENT_LED_COUNT * 2 + 4 + 1, mainLedsArray);
-    fillNubreByColorPallete(SEGMENT_LED_COUNT * 7 * 3 + DOTES_LED_COUNT, SEGMENT_LED_COUNT * 3 + 6 + 1, mainLedsArray);*/
+    fillNubreByColorPallete(SEGMENT_LED_COUNT * 7 * 3 + DOTES_LED_COUNT, SEGMENT_LED_COUNT * 3 + 6 + 1, mainLedsArray);
 }
 
 void ClockDisplay::fillColorToLedSegment(LedPixel ledArray[], byte start, byte count, CRGB color){
