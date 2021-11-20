@@ -1,28 +1,19 @@
 #include <LedClockOn7Segments.h>
 #include <stdlib.h>
 
-/*
 LedClockOn7Segments::LedClockOn7Segments(){
-
-       // displaySettings = loadSettings();
-
-       // display = ClockDisplay(displaySettings);
-
-}*/
-bool LedClockOn7Segments::isMenuMode(){
-    return (state == MENU_HOUR || state == MENU_MINUTES || state == MENU_PLUS_COLOR || state == MENU_SUB_COLOR || state == MENU_COLOR || state == MENU_BRIGHTNESS);
+    displaySettings = loadSettings();
+    display.setSettings(displaySettings);
 }
-void LedClockOn7Segments::drowCurentState(){
-    
+bool LedClockOn7Segments::isMenuMode(){
+    return (state == MENU);
+}
+void LedClockOn7Segments::drowCurentState(){    
     if(!isMenuMode()){
         drowClockState();
     }else{
         drowMenuState();        
     }
-    
-   
-    
-    
 }
 
 void LedClockOn7Segments::drowClockState(){
@@ -34,14 +25,11 @@ void LedClockOn7Segments::drowClockState(){
         case CUR_T_OUTDOOR:
             if(drowTemperatureIfCan(ledClock.outdoorStats)){
                 break;
-            }        
-            
+            }                    
         case CUR_T_INDOOR:
             if(drowTemperatureIfCan(ledClock.indoorStats)){
                 break;
-            }        
-            
-        
+            } 
         default:
             display.drowTimeOnDispley(curentHour, curentMinute);
             break;
@@ -49,7 +37,7 @@ void LedClockOn7Segments::drowClockState(){
 }
 
 void LedClockOn7Segments::drowMenuState(){
-    if(menu == NULL) exit;
+    if(menu == NULL) return;
     display.setSettings(menu->getSettings());
     switch (menu->currentMenu())
     {
@@ -75,48 +63,13 @@ void LedClockOn7Segments::drowMenuState(){
     }
 }
 
-void LedClockOn7Segments::drowCurentStateOnValueChanging(){
-    
-   /* 
-    clearDispley();
-    clearIcons();
-   
-    switch (getClockState())
-    {
-    case MENU_HOUR:        
-        drowMenuTimeOnDispley();
-        break;
-    case MENU_MINUTES:        
-        drowMenuTimeOnDispley();
-        break;
-    case MENU_COLOR:
-       // drowMenuTimeOnDispley();
-        drowLedSegment(ledMain, 0, NUM_LEDS - SIGN_LED_COUNT, CRGB::Black, PLUS_ZERO);
-        drowColorPallete();
-        //drowColorPallete();        
-        break;
-    case MENU_PLUS_COLOR:        
-        drowLedSegment(ledMain, 0, NUM_LEDS - SIGN_LED_COUNT, CRGB::Black, PLUS_ZERO);
-        drowColorPallete();
-        break;
-    case MENU_SUB_COLOR:        
-        drowLedSegment(ledMain, 0, NUM_LEDS - SIGN_LED_COUNT, CRGB::Black, PLUS_ZERO);
-        drowColorPallete();
-        break;
-    default:
-        drowTimeOnDispley();
-        break;
-    }
-    */
-}
 
 void LedClockOn7Segments::tick(){
     if((millis() - mil) >=50){
         cronCounter++;
         display.tick();
         mil = millis();        
-    }    
-    
+    }        
     switch (cronCounter % 20){
     case 1: //Зпрос датчика температуры
         if(*requestTempCallbackFunction!=NULL && cronCounter>=1200){
@@ -133,21 +86,16 @@ void LedClockOn7Segments::tick(){
     case 0:
         drowCurentState();
         cronCounter++;
-        break; 
-   
+        break;    
     case 5:
         if(*timeUpdateCallbackFunction!=NULL)timeUpdateCallbackFunction(); 
         cronCounter++;
-        break;
-    
-    default:
-        
+        break;    
+    default:        
         break;   
-    }
-    
+    }    
     display.render();
 }
-
 
 void LedClockOn7Segments::saveSettings(DisplaySettings diaplaySettings){
     Settings settings = Settings(diaplaySettings.clockColor.hue, diaplaySettings.subZeroColor.hue, diaplaySettings.plusZeroColor.hue, diaplaySettings.brightness);
@@ -162,27 +110,29 @@ DisplaySettings LedClockOn7Segments::loadSettings(){
     loadedSettings.subZeroColor = CHSV(settings.getSuZeroColorHue(), 255, 255);
     loadedSettings.plusZeroColor = CHSV(settings.getPlusZeroColorHue(), 255, 255);
     loadedSettings.brightness = settings.getBrightness();
+    return loadedSettings;
 }
-
-
-
-
 
 void LedClockOn7Segments::attachGetTimeFunction(void (*func)()){
     timeUpdateCallbackFunction = func;
 }
+
 void LedClockOn7Segments::attachSetTimeToHarwareFunction(void (*func)(byte, byte, byte)){
     setHardwareClockTo = func;
 }
+
 void LedClockOn7Segments::attachRequestTempFunction(void (*func)()){
     requestTempCallbackFunction = func;
 }
+
 void LedClockOn7Segments::attachGetAnswerTempFunction(void (*func)()){
     getAnswerTempCallbackFunction = func;
 }
+
 void LedClockOn7Segments::attachMainLedsArray(CRGB ledArray[]){
-     display.attachMainLedsArray(ledArray);
+    display.attachMainLedsArray(ledArray);
 }
+
 void LedClockOn7Segments::attachIconLedsArray(CRGB ledArray[]){
     display.attachIconLedsArray(ledArray);
 }
@@ -249,21 +199,25 @@ void LedClockOn7Segments::statsButtonClick(){
     //TODO:
 }
 void LedClockOn7Segments::menuButtonClick(){
+#ifdef DEBAG
     Serial.println("MenuCLick");
+#endif
     if(menu == NULL){
         menu = new ClockMenu(displaySettings);
-        changeStateTo(MENU_HOUR, 30);
+        changeStateTo(MENU, 30);
     }else{
         //saveMenu(menu);
     }
     
 }
 void LedClockOn7Segments::menuNextButtonClick(){
+#ifdef DEBAG
     Serial.println("Next Menu");
+#endif
     if(menu != NULL){
-        clockStates nextMenu = menu->nextMenu();
+        menuStates nextMenu = menu->nextMenu();
         if(nextMenu != MENU_SAVE){
-             changeStateTo(nextMenu, 30);
+             changeStateTo(MENU, 30);
         }else{
             //setSettingsFromMenu(); //TODO: набор сохраняемых параметров выделить в одельную сущность
             
@@ -279,34 +233,39 @@ void LedClockOn7Segments::menuNextButtonClick(){
     }
 }
 void LedClockOn7Segments::menuPlusButtonClick(){
+#ifdef DEBAG
     Serial.println("PLus");
+#endif
     if(menu != NULL){
-       changeStateTo(menu->currentMenu(), 30);
+       changeStateTo(MENU, 30);
        menu->increseValue();  
        cronCounter = 0;  
        display.setSettings(menu->getSettings());
        //custormColor =  menu->getCurrentColor();
-       drowCurentStateOnValueChanging(); 
+       //drowCurentStateOnValueChanging(); 
        display.render(); 
     }
 }
 void LedClockOn7Segments::menuMinusButtonClick(){
+#ifdef DEBAG
     Serial.println("Minus");
+#endif
     if(menu != NULL){
-       changeStateTo(menu->currentMenu(), 30);
+       changeStateTo(MENU, 30);
        menu->decreaseValue();  
        cronCounter = 0;  
        display.setSettings(menu->getSettings());
        //custormColor =  menu->getCurrentColor();//TODO дублируемый код
-       drowCurentStateOnValueChanging();
+      // drowCurentStateOnValueChanging();
        display.render();     
     }
 }
 
 
 clockStates LedClockOn7Segments::changeNextAvailable(){
-    
+#ifdef DEBAG   
     Serial.println(state);
+#endif
     switch (state)
     {
     case CUR_TIME:
@@ -328,9 +287,7 @@ clockStates LedClockOn7Segments::changeNextAvailable(){
 }
 
 void LedClockOn7Segments::changeStateTo(clockStates st, byte worckDuration){
-    if(st == MENU_HOUR) {
-        //startMenu();
-    }
+    
     stateStartMilles = millis();
     workPeriodInSeconds = worckDuration;
     state = st;

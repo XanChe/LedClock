@@ -4,7 +4,7 @@ ClockMenu::ClockMenu(DisplaySettings settings)
 {
     this->settings = settings;
 }
-clockStates ClockMenu::nextMenu(){
+menuStates ClockMenu::nextMenu(){
     switch (menuState)
     {
     case MENU_HOUR:
@@ -33,7 +33,7 @@ clockStates ClockMenu::nextMenu(){
     return menuState;
 }
 
-clockStates ClockMenu::currentMenu(){
+menuStates ClockMenu::currentMenu(){
     return menuState;
 }
 
@@ -88,8 +88,7 @@ void ClockMenu::decreaseValue(){
         break;
     case MENU_BRIGHTNESS:
         decreaseBrightness();
-        break;
-    
+        break;    
     default:
         break;
     }
@@ -112,7 +111,9 @@ void ClockMenu::decreaseColor(CHSV &color){
 void ClockMenu::increaseColor(CHSV &color){
     int hue = color.hue;
     if(++hue > 192) hue = 0;
+#ifdef DEBAG
     Serial.println(hue);
+#endif
     color = CHSV(hue, 255, 255);
 }
 void ClockMenu::decreaseBrightness(){

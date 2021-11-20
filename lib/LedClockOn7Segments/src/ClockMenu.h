@@ -12,7 +12,7 @@ private:
     byte minute;      
 
     DisplaySettings settings;
-    clockStates menuState = MENU_HOUR;
+    menuStates menuState = MENU_HOUR;
     /* data */
     void decreaseHour();
     void increaseHour();
@@ -29,18 +29,9 @@ public:
     
     void increseValue();
     void decreaseValue();
-    clockStates nextMenu();
-    clockStates currentMenu();
-    
-    /*CHSV getClockColor(){
-        return clockColor;
-    }
-    CHSV getSubZeroColor(){
-        return subZeroColor;
-    }
-    CHSV getPlusZeroColor(){
-        return plusZeroColor;
-    }*/
+    menuStates nextMenu();
+    menuStates currentMenu();    
+   
     byte getHour(){
         return hour;
     }

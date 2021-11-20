@@ -31,7 +31,7 @@ private:
     void (*requestTempCallbackFunction)(); // обратный вызов онборд датчика температуры: запрос к датчику
     void (*getAnswerTempCallbackFunction)();// /--/: получение данных с датчика, вызывается ~ через секунду после запроса 
 
-    unsigned long mil =0; // нужен для инкрумента cronCounter каждые 50 млс
+    unsigned long mil =0; // нужен для инкримента cronCounter каждые 50 млс
 
     clockStates state = CUR_TIME; // текущее состояние часов
     unsigned long stateStartMilles = 0; // когда часы перешли в тек. состояние
@@ -42,7 +42,6 @@ private:
 
             // для CUSTOM_COLOR эффекта
 
-    //яркость экрана
 
     /**
      * методы управление состоянием часов
@@ -68,10 +67,7 @@ private:
     DisplaySettings loadSettings();
 
 public:
-    LedClockOn7Segments(){
-        displaySettings = loadSettings();
-        display.setSettings(displaySettings);
-    }
+    LedClockOn7Segments();
 
     TemperatureSensorStats outdoorStats = TemperatureSensorStats(OUTDOOR_T);    // Накопиль статистики наружной температуры
     TemperatureSensorStats indoorStats = TemperatureSensorStats(INDOOR_T);      // Тоже самое для датчика на борту
