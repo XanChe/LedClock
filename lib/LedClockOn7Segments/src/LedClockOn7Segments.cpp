@@ -22,10 +22,10 @@ void LedClockOn7Segments::drowClockState(){
             if(menu != NULL) delete menu;
             display.drowTimeOnDispley(curentHour, curentMinute);
             break;
-       /* case CUR_T_OUTDOOR:
+        case CUR_T_OUTDOOR:
             if(drowTemperatureIfCan(ledClock.outdoorStats)){
                 break;
-            }        */            
+            }                   
         case CUR_T_INDOOR:
             if(drowTemperatureIfCan(ledClock.indoorStats)){
                 break;
@@ -38,15 +38,15 @@ void LedClockOn7Segments::drowClockState(){
 
 void LedClockOn7Segments::drowMenuState(){
     if(menu == NULL) return;
-    display.setSettings(menu->getSettings());
-    switch (menu->currentMenu())
+    //display.setSettings(menu->getSettings());
+    menuStates menustate = menu->currentMenu();
+    switch(menustate)
     {
     case MENU_HOUR:                
-        display.drowMenuTimeOnDispley(menu->getHour(), menu->getMinute(), state);
-        
+        display.drowMenuTimeOnDispley(menu->getHour(), menu->getMinute(), menustate);        
         break;
     case MENU_MINUTES:
-        display.drowMenuTimeOnDispley(menu->getHour(), menu->getMinute(), state);
+        display.drowMenuTimeOnDispley(menu->getHour(), menu->getMinute(), menustate);
         break;
     case MENU_COLOR:
         display.drowTimeOnDispley(menu->getHour(), menu->getMinute());
@@ -95,7 +95,7 @@ void LedClockOn7Segments::tick(){
     default:        
         break;   
     }    
-    display.render();
+    display.periodicalRender();
    
 }
 
@@ -169,7 +169,7 @@ void LedClockOn7Segments::setCurentIndoorTemperature(char t){
 }
 
 void LedClockOn7Segments::setCurentOutdoorTemperature(char t){
-   // setCurentTemperature(outdoorStats, t);
+    setCurentTemperature(outdoorStats, t);
 }
 
 void LedClockOn7Segments::setCurentTemperature(TemperatureSensorStats &tStats, char t){
@@ -185,9 +185,8 @@ bool LedClockOn7Segments::checkStateAvailable(clockStates st){
     case CUR_T_INDOOR:
         return indoorStats.canBeShowed(curentDateTimeInMinutes);
         break;
-    case CUR_T_OUTDOOR:
-        return false;
-        //return outdoorStats.canBeShowed(curentDateTimeInMinutes);
+    case CUR_T_OUTDOOR:        
+        return outdoorStats.canBeShowed(curentDateTimeInMinutes);
     
     default:
         return false;
@@ -202,9 +201,9 @@ void LedClockOn7Segments::statsButtonClick(){
     //TODO:
 }
 void LedClockOn7Segments::menuButtonClick(){    
-
+    Serial.println("Menu");
     if(menu == NULL){
-        menu = new ClockMenu(displaySettings);
+        menu = new ClockMenu(&displaySettings);
         changeStateTo(MENU, 30);
     }else{
         //saveMenu(menu);
@@ -238,13 +237,13 @@ void LedClockOn7Segments::menuPlusButtonClick(){
     Serial.println("PLus");
 #endif
     if(menu != NULL){
-       changeStateTo(MENU, 30);
-       menu->increseValue();  
-       cronCounter = 0;  
-       display.setSettings(menu->getSettings());
-       //custormColor =  menu->getCurrentColor();
-       //drowCurentStateOnValueChanging(); 
-       display.render(); 
+        changeStateTo(MENU, 30);
+        menu->increseValue();  
+        display.cronCounter = 0;
+        display.setSettings(menu->getSettings());
+        //custormColor =  menu->getCurrentColor();
+        //drowCurentStateOnValueChanging(); 
+        display.render(); 
     }
 }
 void LedClockOn7Segments::menuMinusButtonClick(){
@@ -252,13 +251,13 @@ void LedClockOn7Segments::menuMinusButtonClick(){
     Serial.println("Minus");
 #endif
     if(menu != NULL){
-       changeStateTo(MENU, 30);
-       menu->decreaseValue();  
-       cronCounter = 0;  
-       display.setSettings(menu->getSettings());
-       //custormColor =  menu->getCurrentColor();//TODO дублируемый код
-      // drowCurentStateOnValueChanging();
-       display.render();     
+        changeStateTo(MENU, 30);
+        menu->decreaseValue();  
+        display.cronCounter = 0; 
+        display.setSettings(menu->getSettings());
+        //custormColor =  menu->getCurrentColor();//TODO дублируемый код
+        // drowCurentStateOnValueChanging();
+        display.render();     
     }
 }
 

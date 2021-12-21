@@ -111,8 +111,7 @@ void ClockDisplay::drowTimeOnDispley(byte hour, byte minutes, showingLedEffects 
     drowHour(hour, effect);     
 }
 
-void ClockDisplay::drowMenuTimeOnDispley(byte hour, byte minutes, clockStates st){     
-
+void ClockDisplay::drowMenuTimeOnDispley(byte hour, byte minutes, menuStates st){ 
     clearDispley();    
     drowMinutes(minutes,st == MENU_MINUTES ? BLINK : DAYLY);    
     drowDotes(OFF);  
@@ -140,20 +139,21 @@ void ClockDisplay::drowNumber(int startindex, byte number, showingLedEffects eff
         z += SEGMENT_LED_COUNT;      
     }
 }
-
-void ClockDisplay::render(byte brigth){
+void ClockDisplay::periodicalRender(byte brigth){
     if(cronCounter % 10 == 0 ){
-        if(iconLedsArray != NULL) {
-            renderIcons(iconLedsArray);
-        }
-        if(mainLedsArray != NULL){
-            render(mainLedsArray);
-        }
-        CurFastLED.setBrightness(brigth==0 ? displaySettings.brightness: brigth);
-        CurFastLED.show();
-        
+        render(brigth);        
     }
     
+}
+void ClockDisplay::render(byte brigth){
+    if(iconLedsArray != NULL) {
+        renderIcons(iconLedsArray);
+    }
+    if(mainLedsArray != NULL){
+        render(mainLedsArray);
+    }
+    CurFastLED.setBrightness(brigth==0 ? displaySettings.brightness: brigth);
+    CurFastLED.show();
 }
 
 void ClockDisplay::render(CRGB displayLed[]){

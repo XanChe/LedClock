@@ -51,7 +51,7 @@ const byte numbers[] = {
 class ClockDisplay
 {
 private:
-    unsigned long cronCounter = 0; // счетчик циклов, условно - длится 50 млс. 
+     
 
     LedPixel ledIcons[NUM_ICON_LEDS];   // масив, что и как отрисовывать на основном дисплее. Сюда всё рисуется
     LedPixel ledMain[NUM_LEDS];         // тоже самае для иконок
@@ -89,7 +89,7 @@ private:
     
         
 public:   
-    
+    unsigned long cronCounter = 0; // счетчик циклов, условно - длится 50 млс.
     ClockDisplay(DisplaySettings settings){
         displaySettings = settings;
     }
@@ -111,11 +111,12 @@ public:
     void drowTimeOnDispley(showingLedEffects effect = DAYLY);
     void drowMenuTimeOnDispley(showingLedEffects effect = DAYLY);
     void drowTimeOnDispley( byte hour, byte minutes, showingLedEffects effect = DAYLY);
-    void drowMenuTimeOnDispley(byte hour, byte minutes, clockStates st);
+    void drowMenuTimeOnDispley(byte hour, byte minutes, menuStates st);
      // рисуем иконки 
     void drowTemperatureOnDispley(int t, icons ic);        
     void drowColorPallete(int8_t hue);
     void clear();
+    void periodicalRender(byte brigth = 0);
     void render(byte brigth = 0);
 };
 

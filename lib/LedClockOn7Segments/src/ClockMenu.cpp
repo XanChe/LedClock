@@ -1,6 +1,6 @@
 #include <ClockMenu.h>
 
-ClockMenu::ClockMenu(DisplaySettings settings)
+ClockMenu::ClockMenu(DisplaySettings *settings)
 {
     this->settings = settings;
 }
@@ -51,13 +51,13 @@ void ClockMenu::increseValue(){
         increaseMinute();
         break;
     case MENU_COLOR:
-        increaseColor(settings.clockColor);
+        increaseColor(settings->clockColor);
         break;
     case MENU_PLUS_COLOR:
-        increaseColor(settings.plusZeroColor);
+        increaseColor(settings->plusZeroColor);
         break;
     case MENU_SUB_COLOR:
-        increaseColor(settings.subZeroColor);
+        increaseColor(settings->subZeroColor);
         break;
     case MENU_BRIGHTNESS:
         increaseBrightness();
@@ -78,13 +78,13 @@ void ClockMenu::decreaseValue(){
         decreaseMinute();
         break;
     case MENU_COLOR:
-        decreaseColor(settings.clockColor);
+        decreaseColor(settings->clockColor);
         break;
     case MENU_PLUS_COLOR:
-        decreaseColor(settings.plusZeroColor);
+        decreaseColor(settings->plusZeroColor);
         break;
     case MENU_SUB_COLOR:
-        decreaseColor(settings.subZeroColor);
+        decreaseColor(settings->subZeroColor);
         break;
     case MENU_BRIGHTNESS:
         decreaseBrightness();
@@ -117,10 +117,10 @@ void ClockMenu::increaseColor(CHSV &color){
     color = CHSV(hue, 255, 255);
 }
 void ClockMenu::decreaseBrightness(){
-    if(settings.brightness > 15) settings.brightness--;
+    if(settings->brightness > 15) settings->brightness--;
 }
 void ClockMenu::increaseBrightness(){
-    if(settings.brightness < 255) settings.brightness++;
+    if(settings->brightness < 255) settings->brightness++;
 }
 /*
 CHSV ClockMenu::getCurrentColor(){

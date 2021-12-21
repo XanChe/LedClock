@@ -20,8 +20,8 @@ private:
     //unsigned long curentTime = 0;
     unsigned long curentDateTimeInMinutes = 0; // время в минутах ??
 
-   // TemperatureSensorStats outdoorStats = TemperatureSensorStats(OUTDOOR_T);    // Накопиль статистики наружной температуры
-    TemperatureSensorStats indoorStats = TemperatureSensorStats(INDOOR_T);      // Тоже самое для датчика на борту
+    TemperatureSensorStats outdoorStats = TemperatureSensorStats(OUTDOOR_T, 12);    // Накопиль статистики наружной температуры
+    TemperatureSensorStats indoorStats = TemperatureSensorStats(INDOOR_T, 60);      // Тоже самое для датчика на борту
     
     DisplaySettings displaySettings;
     ClockDisplay display = ClockDisplay(displaySettings);

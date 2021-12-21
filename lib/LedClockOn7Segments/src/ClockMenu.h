@@ -11,7 +11,7 @@ private:
     byte hour;
     byte minute;      
 
-    DisplaySettings settings;
+    DisplaySettings *settings;
     menuStates menuState = MENU_HOUR;
     /* data */
     void decreaseHour();
@@ -25,7 +25,7 @@ private:
 
 public:
     
-    ClockMenu(DisplaySettings settings);
+    ClockMenu(DisplaySettings *settings);
     
     void increseValue();
     void decreaseValue();
@@ -41,7 +41,7 @@ public:
     
   //  CHSV getCurrentColor();
     DisplaySettings getSettings(){
-        return settings;
+        return *settings;
     }
 };
 
