@@ -3,13 +3,19 @@
 #include <LibConfig.h>
 
 
-TemperatureSensorStats::TemperatureSensorStats(icons ic)
+TemperatureSensorStats::TemperatureSensorStats(icons ic, byte startInd)
 {
     icon = ic;
-    for(byte i; i <24; i++){
+    this->stratIndOnFlesh = startInd;
+    /*for(byte i; i <24; i++){
         maxTemperatureStatsArray[i] = -120;
         minTemperatureStatsArray[i] = 120;
-    }
+    }*/
+}
+
+void TemperatureSensorStats::saveCurrentHourStats(){
+     EEPROM.write(stratIndOnFlesh + currentHour * 2, currentMaxT);
+     EEPROM.write(stratIndOnFlesh + currentHour * 2 +1, currentMinT);
 }
 
 void TemperatureSensorStats::putCurrentTemperature(unsigned long dateTimeInMinutes, byte hour, byte minute, char temperature){
@@ -21,19 +27,31 @@ void TemperatureSensorStats::putCurrentTemperature(unsigned long dateTimeInMinut
     }
     
     isValide = abs(dateTimeInMinutes - lastDataCommit ) <= SENSOR_TIMEOUT_IN_MINUTE;
-    if(minute == 0) {
-        maxTemperatureStatsArray[hour] = temperature;
-        minTemperatureStatsArray[hour] = temperature;
-    }else{
-        maxTemperatureStatsArray[hour] = max(temperature, maxTemperatureStatsArray[hour]);
-        minTemperatureStatsArray[hour] = min(temperature, minTemperatureStatsArray[hour]);
+    if(isValide){
+        if(hour != currentHour){
+            saveCurrentHourStats();
+            currentHour = hour;
+            currentMaxT = temperature;
+            currentMinT = temperature;
+        }else{
+            currentMaxT = max(temperature, currentMaxT);
+            currentMinT = min(temperature, currentMinT);
+        }
+       /* if(minute == 0) {
+            maxTemperatureStatsArray[hour] = temperature;
+            minTemperatureStatsArray[hour] = temperature;
+        }else{
+            maxTemperatureStatsArray[hour] = max(temperature, maxTemperatureStatsArray[hour]);
+            minTemperatureStatsArray[hour] = min(temperature, minTemperatureStatsArray[hour]);
+        }*/
     }
+    
 }
 
 int TemperatureSensorStats::getMaxtemperature(){
     char maxT = -120;
     for(byte i = 0; i<24; i++){
-        maxT = max(maxT, maxTemperatureStatsArray[i]);
+        maxT = max(maxT, EEPROM.read(stratIndOnFlesh + i * 2));
     }
     return maxT;
 }
@@ -41,7 +59,7 @@ int TemperatureSensorStats::getMaxtemperature(){
 int TemperatureSensorStats::getMintemperature(){
     char minT = 120;
     for(byte i = 0; i<24; i++){
-        minT = min(minT, minTemperatureStatsArray[i]);
+        minT = min(minT, EEPROM.read(stratIndOnFlesh + i * 2 + 1));
     }
     return minT;
 }
