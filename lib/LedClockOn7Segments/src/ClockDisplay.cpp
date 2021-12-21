@@ -151,6 +151,7 @@ void ClockDisplay::render(byte brigth){
         }
         CurFastLED.setBrightness(brigth==0 ? displaySettings.brightness: brigth);
         CurFastLED.show();
+        
     }
     
 }

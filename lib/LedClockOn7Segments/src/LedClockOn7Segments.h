@@ -19,6 +19,9 @@ private:
     byte curentSecond = 0;
     //unsigned long curentTime = 0;
     unsigned long curentDateTimeInMinutes = 0; // время в минутах ??
+
+   // TemperatureSensorStats outdoorStats = TemperatureSensorStats(OUTDOOR_T);    // Накопиль статистики наружной температуры
+    TemperatureSensorStats indoorStats = TemperatureSensorStats(INDOOR_T);      // Тоже самое для датчика на борту
     
     DisplaySettings displaySettings;
     ClockDisplay display = ClockDisplay(displaySettings);
@@ -68,10 +71,6 @@ private:
 
 public:
     LedClockOn7Segments();
-
-    TemperatureSensorStats outdoorStats = TemperatureSensorStats(OUTDOOR_T);    // Накопиль статистики наружной температуры
-    TemperatureSensorStats indoorStats = TemperatureSensorStats(INDOOR_T);      // Тоже самое для датчика на борту
-    
     /**
      * Методы нужные для привязки конкретного железа с наружи библиотеки
      * 
@@ -83,6 +82,7 @@ public:
     void attachGetAnswerTempFunction(void (*func)());
     void attachMainLedsArray(CRGB ledArray[]);
     void attachIconLedsArray(CRGB ledArray[]);
+    
     void setCurTime(byte day, byte hour, byte minutes, byte seconds);
     void setCurentIndoorTemperature(char t);
     void setCurentOutdoorTemperature(char t);

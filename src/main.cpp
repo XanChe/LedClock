@@ -5,7 +5,7 @@
 #else
 #define logg(x) 
 #endif
-
+#define FAST_ALGORITHM
 #include "LedClockOn7Segments.h"
 #include <math.h>
 #define DS_TEMP_TYPE float
@@ -15,21 +15,16 @@
 #include "GyverEncoder.h" 
 #include "microDS3231.h"// для работы с модулем реального времени
 
-// Singleton instance of the radio driver
-
-
-#define CLK 5   // куда подключать энкодер
+#define CLK 3   // куда подключать энкодер
 #define DT 4    // ---
-#define SW 6    // ---
-#define DATA_PIN 8 //основная лента
+#define SW 5    // ---
+#define DATA_PIN 6 //основная лента
 #define DATA_ICON_PIN 7 // лента с иконками
-
 
 MicroDS3231 rtc;
 Encoder enc1(CLK, DT, SW); 
 RH_NRF905 nrf905;
-
-MicroDS18B20<12> sensor;
+MicroDS18B20<A0> sensor;
 
 CRGBArray<NUM_LEDS> leds;
 CRGBArray<NUM_ICON_LEDS> ledIcons;
@@ -38,14 +33,17 @@ void configurateFastLED();
 void configurateLedClock();
 void configurateControls();
 void configurateSensors();
+
 void updateTime();
 void saveTime(byte, byte, byte);
+
 void requestTemp();
 void getAnswerTemp();
+
 void start_clockDS3231();
+
 void clickSwitchMenu();
 void clickStatsButton();
-
 void checkRemoteSensor();
 void controlInspection();
 
@@ -57,26 +55,25 @@ void setup() {
     configurateSensors();
     configurateFastLED();
     configurateLedClock();
-    
-    updateTime();
-    //ledClock.setCurTime(1,8,58,33);
-    // ledClock.setCurentIndoorTemperature(23);
+    /*
+    updateTime();   
     ledClock.setCurentOutdoorTemperature(-15);
     delay(1000);
     updateTime();
-    ledClock.setCurentOutdoorTemperature(-15);
-
+    ledClock.setCurentOutdoorTemperature(-15);*/
+    delay(1000);
 }
 
 void loop() {
     checkRemoteSensor();
     controlInspection();
-    
     ledClock.tick();
+    
 }
 void controlInspection(){
+    
     enc1.tick();
-    if(enc1.isRight())  ledClock.menuPlusButtonClick();
+    if(enc1.isRight()) ledClock.menuPlusButtonClick();
     if(enc1.isLeft())   ledClock.menuMinusButtonClick();
     if(enc1.isHolded()) ledClock.menuButtonClick();
     if(enc1.isSingle())  ledClock.menuNextButtonClick();
@@ -101,13 +98,16 @@ void checkRemoteSensor(){
 
 void configurateControls(){
     enc1.setType(TYPE2);
+    enc1.setTickMode(false);
 }
 
 void configurateSensors(){
     sensor.setResolution(11); // точность датчика температуры на борту
 
     if (!nrf905.init()){    // подключение к радиомодулю
-        logg("init failed");
+        logg("RF init failed");
+    }else{
+        logg("RF init sacsess");
     }
 }
 

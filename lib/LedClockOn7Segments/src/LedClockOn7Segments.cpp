@@ -8,7 +8,7 @@ LedClockOn7Segments::LedClockOn7Segments(){
 bool LedClockOn7Segments::isMenuMode(){
     return (state == MENU);
 }
-void LedClockOn7Segments::drowCurentState(){    
+void LedClockOn7Segments::drowCurentState(){  
     if(!isMenuMode()){
         drowClockState();
     }else{
@@ -22,10 +22,10 @@ void LedClockOn7Segments::drowClockState(){
             if(menu != NULL) delete menu;
             display.drowTimeOnDispley(curentHour, curentMinute);
             break;
-        case CUR_T_OUTDOOR:
+       /* case CUR_T_OUTDOOR:
             if(drowTemperatureIfCan(ledClock.outdoorStats)){
                 break;
-            }                    
+            }        */            
         case CUR_T_INDOOR:
             if(drowTemperatureIfCan(ledClock.indoorStats)){
                 break;
@@ -68,17 +68,18 @@ void LedClockOn7Segments::tick(){
     if((millis() - mil) >=50){
         cronCounter++;
         display.tick();
-        mil = millis();        
+        mil = millis(); 
+        if(cronCounter >= 5000) cronCounter = 0;      
     }        
     switch (cronCounter % 20){
     case 1: //Зпрос датчика температуры
-        if(*requestTempCallbackFunction!=NULL && cronCounter>=1200){
+        if(*requestTempCallbackFunction!=NULL && cronCounter>=1200 && cronCounter % 100 < 20){
             requestTempCallbackFunction();
             cronCounter++;
         }
         break;    
-    case 18: //Через чуть-менее секунды - получить ответ
-        if(*getAnswerTempCallbackFunction!=NULL && cronCounter>=1200){
+    case 18: //Через ~4 секунды - получить ответ
+        if(*getAnswerTempCallbackFunction!=NULL && cronCounter % 100 > 78){
             getAnswerTempCallbackFunction();
            cronCounter++;
         }
@@ -95,6 +96,7 @@ void LedClockOn7Segments::tick(){
         break;   
     }    
     display.render();
+   
 }
 
 void LedClockOn7Segments::saveSettings(DisplaySettings diaplaySettings){
@@ -167,7 +169,7 @@ void LedClockOn7Segments::setCurentIndoorTemperature(char t){
 }
 
 void LedClockOn7Segments::setCurentOutdoorTemperature(char t){
-    setCurentTemperature(outdoorStats, t);
+   // setCurentTemperature(outdoorStats, t);
 }
 
 void LedClockOn7Segments::setCurentTemperature(TemperatureSensorStats &tStats, char t){
@@ -184,7 +186,8 @@ bool LedClockOn7Segments::checkStateAvailable(clockStates st){
         return indoorStats.canBeShowed(curentDateTimeInMinutes);
         break;
     case CUR_T_OUTDOOR:
-        return outdoorStats.canBeShowed(curentDateTimeInMinutes);
+        return false;
+        //return outdoorStats.canBeShowed(curentDateTimeInMinutes);
     
     default:
         return false;
@@ -198,10 +201,8 @@ void LedClockOn7Segments::switchModeButtonClick(){
 void LedClockOn7Segments::statsButtonClick(){
     //TODO:
 }
-void LedClockOn7Segments::menuButtonClick(){
-#ifdef DEBAG
-    Serial.println("MenuCLick");
-#endif
+void LedClockOn7Segments::menuButtonClick(){    
+
     if(menu == NULL){
         menu = new ClockMenu(displaySettings);
         changeStateTo(MENU, 30);
@@ -293,7 +294,7 @@ void LedClockOn7Segments::changeStateTo(clockStates st, byte worckDuration){
     state = st;
 }
 
-clockStates LedClockOn7Segments::getClockState(){
+clockStates LedClockOn7Segments::getClockState(){   
     if(millis() < stateStartMilles + workPeriodInSeconds*1000){
         return state;
     }else{
@@ -301,6 +302,5 @@ clockStates LedClockOn7Segments::getClockState(){
         return state;
     }
 }
-
 
 LedClockOn7Segments ledClock = LedClockOn7Segments();
