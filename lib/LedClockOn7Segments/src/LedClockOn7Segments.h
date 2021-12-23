@@ -20,8 +20,8 @@ private:
     //unsigned long curentTime = 0;
     unsigned long curentDateTimeInMinutes = 0; // время в минутах ??
 
-    TemperatureSensorStats outdoorStats = TemperatureSensorStats(OUTDOOR_T, 12);    // Накопиль статистики наружной температуры
-    TemperatureSensorStats indoorStats = TemperatureSensorStats(INDOOR_T, 60);      // Тоже самое для датчика на борту
+    TemperatureSensorStats *outdoorStats = NULL;    // Накопиль статистики наружной температуры
+    TemperatureSensorStats *indoorStats = NULL;      // Тоже самое для датчика на борту
     
     DisplaySettings displaySettings;
     ClockDisplay display = ClockDisplay(displaySettings);
@@ -55,7 +55,7 @@ private:
     bool checkStateAvailable(clockStates st);
 
   
-    bool drowTemperatureIfCan(TemperatureSensorStats tStats);
+    bool drowTemperatureIfCan(TemperatureSensorStats *tStats);
     
     bool isMenuMode();
 
@@ -64,8 +64,11 @@ private:
     void drowCurentState(); //полная отрисовка в зависимости от текущего режима
     void drowCurentStateOnValueChanging();
 
-    void setCurentTemperature(TemperatureSensorStats &tStats, char t);
-  
+    void createSensorStats();
+    void freeSensorStats();
+    
+    void setCurentTemperature(TemperatureSensorStats *tStats, char t);
+    void exitFromMenu();
     void saveSettings(DisplaySettings settings);
     DisplaySettings loadSettings();
 

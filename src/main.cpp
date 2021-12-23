@@ -12,8 +12,9 @@
 #include "microDS18B20.h" // для работы с датчиком температуры на борту
 #include <SPI.h>
 #include "RH_NRF905.h" // для работы с радио модулем
-#include "GyverEncoder.h" 
+//#include "GyverEncoder.h" 
 #include "microDS3231.h"// для работы с модулем реального времени
+#include <EncButton.h>
 
 #define CLK 3   // куда подключать энкодер
 #define DT 4    // ---
@@ -22,7 +23,10 @@
 #define DATA_ICON_PIN 7 // лента с иконками
 
 MicroDS3231 rtc;
-Encoder enc1(CLK, DT, SW); 
+EncButton<EB_TICK, CLK, DT, SW> enc1;
+EncButton<EB_TICK, A2> btnShowStats;
+EncButton<EB_TICK, A3> btnSwitchMode;
+//Encoder enc1(CLK, DT, SW); 
 RH_NRF905 nrf905;
 MicroDS18B20<A0> sensor;
 
@@ -72,11 +76,28 @@ void loop() {
 }
 void controlInspection(){
     
-    enc1.tick();
-    if(enc1.isRight()) ledClock.menuPlusButtonClick();
-    if(enc1.isLeft())   ledClock.menuMinusButtonClick();
-    if(enc1.isHolded()) ledClock.menuButtonClick();
-    if(enc1.isSingle())  ledClock.menuNextButtonClick();
+    
+    if(btnShowStats.tick()){
+        
+        if (btnShowStats.press()){
+            //Serial.println("stats");
+            ledClock.statsButtonClick();
+        } 
+    }
+    if(btnSwitchMode.tick()){
+        
+        if (btnSwitchMode.press()) {
+            //Serial.println("switch");
+            ledClock.switchModeButtonClick();
+        }
+    }
+    if (enc1.tick()) {
+        if(enc1.isRight()) ledClock.menuPlusButtonClick();
+        if(enc1.isLeft())   ledClock.menuMinusButtonClick();
+        if(enc1.isHolded()) ledClock.menuButtonClick();
+        if(enc1.click())  ledClock.menuNextButtonClick();
+        enc1.resetState();
+    }
 }
 void checkRemoteSensor(){
     if (nrf905.available()){
@@ -97,8 +118,8 @@ void checkRemoteSensor(){
 }
 
 void configurateControls(){
-    enc1.setType(TYPE2);
-    enc1.setTickMode(false);
+    /*enc1.setType(TYPE2);
+    enc1.setTickMode(false);*/
 }
 
 void configurateSensors(){

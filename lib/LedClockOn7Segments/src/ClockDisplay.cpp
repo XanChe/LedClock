@@ -25,17 +25,16 @@ void ClockDisplay::fillColorThreeHorizonLines(byte start, byte colorIndex, CRGB 
 
     }    
 }
-void ClockDisplay::fillNubreByColorPallete(byte start, byte colorIndex, CRGB colorPallete[]){
 
-    
+void ClockDisplay::fillNubreByColorPallete(byte start, byte colorIndex, CRGB colorPallete[]){
 
     fillColorToLedSegment(ledMain,start , SEGMENT_LED_COUNT, colorPallete[colorIndex]);
     fillColorToLedSegment(ledMain,start + 4 * SEGMENT_LED_COUNT, SEGMENT_LED_COUNT, colorPallete[colorIndex]);
     fillColorThreeHorizonLines(start, colorIndex + 1, colorPallete);
     fillColorToLedSegment(ledMain,start + 2 * SEGMENT_LED_COUNT , SEGMENT_LED_COUNT, colorPallete[colorIndex + SEGMENT_LED_COUNT]);
     fillColorToLedSegment(ledMain,start + 6 * SEGMENT_LED_COUNT , SEGMENT_LED_COUNT, colorPallete[colorIndex + SEGMENT_LED_COUNT]);
-
 }
+
 void ClockDisplay::drowColorPallete(int8_t hue){
 
     byte gradientLen = 9 + SEGMENT_LED_COUNT * 4;
@@ -51,12 +50,9 @@ void ClockDisplay::drowColorPallete(int8_t hue){
 
 void ClockDisplay::fillColorToLedSegment(LedPixel ledArray[], byte start, byte count, CRGB color){
     for(byte i = start; i < start + count; i++){
-            ledArray[i].color = color;
-            
+            ledArray[i].color = color;            
     }
 }
-
-
 
 void ClockDisplay::drowLedSegment(LedPixel ledArray[], byte start, byte count, CRGB color, showingLedEffects effect, bool isShowed){
     for(byte i = start; i < start + count; i++){
@@ -65,8 +61,6 @@ void ClockDisplay::drowLedSegment(LedPixel ledArray[], byte start, byte count, C
             ledArray[i].effect = effect;
     }
 }
-
-
 
 void ClockDisplay::drowTemperatureOnDispley(int temperature, icons ic){
     clearDispley();
@@ -81,23 +75,14 @@ void ClockDisplay::drowTemperatureOnDispley(int temperature, icons ic){
     drowNumber(SEGMENT_LED_COUNT*7*2+DOTES_LED_COUNT, tempr, effect);
     drowNumber(SEGMENT_LED_COUNT*7*3+DOTES_LED_COUNT, templ, effect);   
     if(temperature<0)drowSign();   
-    drowIcon(ic);
-      
+    drowIcon(ic);      
 }
 
 void ClockDisplay::drowSign(){
     
     drowLedSegment(ledMain, SEGMENT_LED_COUNT*28+DOTES_LED_COUNT, 2, displaySettings.subZeroColor, SUB_ZERO);    
 }
-/*
-void ClockDisplay::drowTimeOnDispley(showingLedEffects effect){
-    drowTimeOnDispley(curentHour, curentMinute, effect);
-}*/
-/*
-void ClockDisplay::drowMenuTimeOnDispley(showingLedEffects effect){
-    if(menu != NULL)drowTimeOnDispley(menu->getHour(), menu->getMinute(), effect);
-}
-*/
+
 void ClockDisplay::drowDotes(showingLedEffects effect){
     
     drowLedSegment(ledMain, SEGMENT_LED_COUNT*7*2, DOTES_LED_COUNT, displaySettings.clockColor, effect);    
@@ -105,14 +90,14 @@ void ClockDisplay::drowDotes(showingLedEffects effect){
 
 void ClockDisplay::drowTimeOnDispley(byte hour, byte minutes, showingLedEffects effect){     
 
-    clearDispley();    
+    clear();    
     drowMinutes(minutes, effect);    
     drowDotes(BLINK);  
     drowHour(hour, effect);     
 }
 
 void ClockDisplay::drowMenuTimeOnDispley(byte hour, byte minutes, menuStates st){ 
-    clearDispley();    
+    clear();    
     drowMinutes(minutes,st == MENU_MINUTES ? BLINK : DAYLY);    
     drowDotes(OFF);  
     drowHour(hour, st == MENU_HOUR ? BLINK : DAYLY);     
@@ -156,13 +141,10 @@ void ClockDisplay::render(byte brigth){
     CurFastLED.show();
 }
 
-void ClockDisplay::render(CRGB displayLed[]){
-    
-        //Serial.println(cronCounter);
+void ClockDisplay::render(CRGB displayLed[]){ 
         for(int i = 0; i < NUM_LEDS; i++){            
             displayLed[i] = applyPixelEffect(ledMain[i]);       
-        }
-        
+        }        
 }
 
 void ClockDisplay::renderIcons(CRGB displayLed[]){  
@@ -170,7 +152,6 @@ void ClockDisplay::renderIcons(CRGB displayLed[]){
             displayLed[i] = applyPixelEffect(ledIcons[i]);
         }           
 }
-
 
 CRGB ClockDisplay::applyPixelEffect(LedPixel ledPixel){
     switch (ledPixel.effect)
@@ -201,8 +182,7 @@ CRGB ClockDisplay::applyPixelEffect(LedPixel ledPixel){
     default:
         return ledPixel.color;
         break;
-    }
-    
+    }    
 }
 
 void ClockDisplay::drowIcon(icons icon){    

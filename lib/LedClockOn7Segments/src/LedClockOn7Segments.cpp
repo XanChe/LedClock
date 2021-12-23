@@ -4,7 +4,18 @@
 LedClockOn7Segments::LedClockOn7Segments(){
     displaySettings = loadSettings();
     display.setSettings(displaySettings);
+    createSensorStats();   
 }
+
+void LedClockOn7Segments::createSensorStats(){    
+    outdoorStats = new TemperatureSensorStats(OUTDOOR_T, 12);    
+    indoorStats = new TemperatureSensorStats(INDOOR_T, 60);
+}
+void LedClockOn7Segments::freeSensorStats(){    
+    delete outdoorStats;    
+    delete indoorStats ;
+}
+
 bool LedClockOn7Segments::isMenuMode(){
     return (state == MENU);
 }
@@ -54,12 +65,18 @@ void LedClockOn7Segments::drowMenuState(){
         break;
     case MENU_PLUS_COLOR:        
         display.drowTemperatureOnDispley(35, icons::FADE_ALL);
-        //drowColorPallete();
+        display.drowColorPallete(menu->getSettings().plusZeroColor.hue);  
         break;
     case MENU_SUB_COLOR:        
         display.drowTemperatureOnDispley(-35, icons::FADE_ALL);
-       // drowColorPallete();
-        break;    
+        display.drowColorPallete(menu->getSettings().subZeroColor.hue);
+        break; 
+    case MENU_BRIGHTNESS:        
+        display.drowTimeOnDispley(menu->getHour(), menu->getMinute());
+        break;
+    case MENU_SAVE:        
+        //TODO "&"
+        break;   
     }
 }
 
@@ -144,9 +161,9 @@ void LedClockOn7Segments::attachFastLED(CFastLED &fLED){
 }
 
 
-bool LedClockOn7Segments::drowTemperatureIfCan(TemperatureSensorStats tStats){
-    if(tStats.canBeShowed(curentDateTimeInMinutes)){
-        display.drowTemperatureOnDispley(tStats.getCurentTemperature(), tStats.getIcon());
+bool LedClockOn7Segments::drowTemperatureIfCan(TemperatureSensorStats *tStats){
+    if(tStats != NULL && tStats->canBeShowed(curentDateTimeInMinutes)){
+        display.drowTemperatureOnDispley(tStats->getCurentTemperature(), tStats->getIcon());
         
         return true;
     }else{
@@ -172,8 +189,8 @@ void LedClockOn7Segments::setCurentOutdoorTemperature(char t){
     setCurentTemperature(outdoorStats, t);
 }
 
-void LedClockOn7Segments::setCurentTemperature(TemperatureSensorStats &tStats, char t){
-    tStats.putCurrentTemperature(curentDateTimeInMinutes, curentHour, curentMinute, t);
+void LedClockOn7Segments::setCurentTemperature(TemperatureSensorStats *tStats, char t){
+    tStats->putCurrentTemperature(curentDateTimeInMinutes, curentHour, curentMinute, t);
 }
 
 bool LedClockOn7Segments::checkStateAvailable(clockStates st){
@@ -183,10 +200,10 @@ bool LedClockOn7Segments::checkStateAvailable(clockStates st){
         return true;
         break;
     case CUR_T_INDOOR:
-        return indoorStats.canBeShowed(curentDateTimeInMinutes);
+        return (indoorStats != NULL && indoorStats->canBeShowed(curentDateTimeInMinutes));
         break;
     case CUR_T_OUTDOOR:        
-        return outdoorStats.canBeShowed(curentDateTimeInMinutes);
+        return (outdoorStats != NULL && outdoorStats->canBeShowed(curentDateTimeInMinutes));
     
     default:
         return false;
@@ -195,21 +212,37 @@ bool LedClockOn7Segments::checkStateAvailable(clockStates st){
 }
 
 void LedClockOn7Segments::switchModeButtonClick(){
+    
     while(!checkStateAvailable(changeNextAvailable()));
 }
+
 void LedClockOn7Segments::statsButtonClick(){
     //TODO:
 }
+
 void LedClockOn7Segments::menuButtonClick(){    
     Serial.println("Menu");
     if(menu == NULL){
+        freeSensorStats();
         menu = new ClockMenu(&displaySettings);
         changeStateTo(MENU, 30);
     }else{
-        //saveMenu(menu);
-    }
-    
+        exitFromMenu();
+        createSensorStats();
+    }    
 }
+
+void LedClockOn7Segments::exitFromMenu(){
+    curentHour = menu->getHour();
+    curentMinute = menu->getMinute();
+    curentSecond = 0;
+    setHardwareClockTo(curentHour, curentMinute, curentSecond);
+    displaySettings = menu->getSettings();
+    delete menu;
+    saveSettings(displaySettings);           
+    changeStateTo(CUR_TIME);
+}
+
 void LedClockOn7Segments::menuNextButtonClick(){
 #ifdef DEBAG
     Serial.println("Next Menu");
@@ -217,21 +250,14 @@ void LedClockOn7Segments::menuNextButtonClick(){
     if(menu != NULL){
         menuStates nextMenu = menu->nextMenu();
         if(nextMenu != MENU_SAVE){
-             changeStateTo(MENU, 30);
+            changeStateTo(MENU, 30);
         }else{
-            //setSettingsFromMenu(); //TODO: набор сохраняемых параметров выделить в одельную сущность
-            
-            curentHour = menu->getHour();
-            curentMinute = menu->getMinute();
-            curentSecond = 0;
-            //setHardwareClockTo(curentHour, curentMinute, curentSecond);
-            displaySettings = menu->getSettings();
-            delete menu;
-            saveSettings(displaySettings);
-            
-        }  
+            exitFromMenu();
+            createSensorStats();
+        }
     }
 }
+
 void LedClockOn7Segments::menuPlusButtonClick(){
 #ifdef DEBAG
     Serial.println("PLus");
