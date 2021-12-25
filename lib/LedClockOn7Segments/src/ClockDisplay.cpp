@@ -6,13 +6,13 @@ void ClockDisplay::clear(){
 }
 
 void ClockDisplay::clearDispley(){     
-    drowLedSegment(ledMain, 0, NUM_LEDS, CRGB::Black, OFF, false);    
+    drowLedSegment(ledMain, 0, NUM_LEDS, 0, OFF, false);    
 }
 
 void ClockDisplay::clearIcons(){     
-    drowLedSegment(ledIcons, 0, NUM_ICON_LEDS, CRGB::Black, OFF, false);    
+    drowLedSegment(ledIcons, 0, NUM_ICON_LEDS, 0, OFF, false);    
 }
-
+/*
 void ClockDisplay::fillColorThreeHorizonLines(byte start, byte colorIndex, CRGB colorPallete[]){
     byte iBottom = start + SEGMENT_LED_COUNT;
     byte iMiddle = start + 4 * SEGMENT_LED_COUNT -1;
@@ -47,14 +47,14 @@ void ClockDisplay::drowColorPallete(int8_t hue){
     fillNubreByColorPallete(SEGMENT_LED_COUNT * 7 * 2 + DOTES_LED_COUNT, SEGMENT_LED_COUNT * 2 + 4 + 1, mainLedsArray);
     fillNubreByColorPallete(SEGMENT_LED_COUNT * 7 * 3 + DOTES_LED_COUNT, SEGMENT_LED_COUNT * 3 + 6 + 1, mainLedsArray);
 }
-
-void ClockDisplay::fillColorToLedSegment(LedPixel ledArray[], byte start, byte count, CRGB color){
+*/
+void ClockDisplay::fillColorToLedSegment(LedPixel ledArray[], byte start, byte count, byte color){
     for(byte i = start; i < start + count; i++){
             ledArray[i].color = color;            
     }
 }
 
-void ClockDisplay::drowLedSegment(LedPixel ledArray[], byte start, byte count, CRGB color, showingLedEffects effect, bool isShowed){
+void ClockDisplay::drowLedSegment(LedPixel ledArray[], byte start, byte count, byte color, showingLedEffects effect, bool isShowed){
     for(byte i = start; i < start + count; i++){
             ledArray[i].color = color;
             ledArray[i].isShowed = isShowed;
@@ -89,7 +89,7 @@ void ClockDisplay::drowDotes(showingLedEffects effect){
 }
 
 void ClockDisplay::drowTimeOnDispley(byte hour, byte minutes, showingLedEffects effect){     
-
+    
     clear();    
     drowMinutes(minutes, effect);    
     drowDotes(BLINK);  
@@ -115,69 +115,76 @@ void ClockDisplay::drowMinutes(byte minutes, showingLedEffects effect){
 }
 
 void ClockDisplay::drowNumber(int startindex, byte number, showingLedEffects effect){ 
-    CRGB segmentColor = CRGB::Black;
+    byte segmentColor = COLOR_BLACK;
     int z = 0;
     for (int i = 0; i < 7; i++) {
         bool isShowed = (numbers[number] & 1 << i) == 1 << i;
-        segmentColor = isShowed ? (CRGB)displaySettings.clockColor : CRGB::Black;
+        segmentColor = isShowed ? displaySettings.clockColor : COLOR_BLACK;
         drowLedSegment(ledMain, z + startindex, SEGMENT_LED_COUNT, segmentColor, effect, isShowed);
         z += SEGMENT_LED_COUNT;      
     }
 }
 void ClockDisplay::periodicalRender(byte brigth){
     if(cronCounter % 10 == 0 ){
+        
         render(brigth);        
     }
     
 }
 void ClockDisplay::render(byte brigth){
-    if(iconLedsArray != NULL) {
-        renderIcons(iconLedsArray);
+    if(setLedIconColor != NULL && showIconLed != NULL) {
+        renderIconStrip(brigth==0 ? displaySettings.brightness: brigth);
+        showIconLed();
     }
-    if(mainLedsArray != NULL){
-        render(mainLedsArray);
+    if(setLedColor != NULL && showMainLed != NULL){
+        renderStrip(brigth==0 ? displaySettings.brightness: brigth);
+        showMainLed();
     }
-    CurFastLED.setBrightness(brigth==0 ? displaySettings.brightness: brigth);
-    CurFastLED.show();
+   
+    
 }
 
-void ClockDisplay::render(CRGB displayLed[]){ 
-        for(int i = 0; i < NUM_LEDS; i++){            
-            displayLed[i] = applyPixelEffect(ledMain[i]);       
-        }        
+void ClockDisplay::renderStrip(byte brigth){         
+    byte curColor = 0;
+    for(int i = 0; i < NUM_LEDS; i++){ 
+        curColor = applyPixelEffect(ledMain[i]);           
+        setLedColor(i, curColor, curColor == 0 ? 0 : 255);       
+    }        
 }
 
-void ClockDisplay::renderIcons(CRGB displayLed[]){  
-        for(int i = 0; i < NUM_ICON_LEDS; i++){
-            displayLed[i] = applyPixelEffect(ledIcons[i]);
-        }           
+void ClockDisplay::renderIconStrip(byte brigth){  
+    byte curColor = 0;
+    for(int i = 0; i < NUM_ICON_LEDS; i++){
+        curColor = applyPixelEffect(ledIcons[i]);
+        setLedIconColor(i, curColor, curColor == 0 ? 0 : 255);           
+    }           
 }
 
-CRGB ClockDisplay::applyPixelEffect(LedPixel ledPixel){
+byte ClockDisplay::applyPixelEffect(LedPixel ledPixel){
     switch (ledPixel.effect)
     {
     case DAYLY:
-        return ledPixel.isShowed  ? ledPixel.color : CRGB::Black;;
+        return ledPixel.isShowed  ? ledPixel.color : 0;
         break;
     case OFF:
-        return  CRGB::Black;        
+        return  0;        
         break;
     case SUB_ZERO:
-        return  ledPixel.isShowed  ? (CRGB)displaySettings.subZeroColor : CRGB::Black;
+        return  ledPixel.isShowed  ? displaySettings.subZeroColor : 0;
         break;
     case PLUS_ZERO:
-        return  ledPixel.isShowed  ? (CRGB)displaySettings.plusZeroColor : CRGB::Black;
+        return  ledPixel.isShowed  ? displaySettings.plusZeroColor : 0;
         break;
     case BLINK:       
         if(cronCounter % 40 < 20) {           
             return ledPixel.color;
         }
         else{
-            return CRGB::Black;
+            return 0;
         }
         break;
     case CUSTOM_COLOR:
-            ledPixel.isShowed  ? (CRGB)displaySettings.custormColor : CRGB::Black;
+            ledPixel.isShowed  ? displaySettings.custormColor : 0;
         break;
     default:
         return ledPixel.color;
@@ -189,42 +196,48 @@ void ClockDisplay::drowIcon(icons icon){
     switch (icon)
     {
     case icons::INDOOR_T:
-        drowLedSegment(ledIcons, 6 , 4, CRGB::AliceBlue, DAYLY);        
+        drowLedSegment(ledIcons, 6 , 4, COLOR_ICONS, DAYLY);        
         break;
     case icons::OUTDOOR_T:
-        drowLedSegment(ledIcons, 10 , 4, CRGB::AliceBlue, DAYLY);
+        drowLedSegment(ledIcons, 10 , 4, COLOR_ICONS, DAYLY);
         break;
     case icons::MAX_T:
-        drowLedSegment(ledIcons, 4 , 1, CRGB::AliceBlue, DAYLY);
+        drowLedSegment(ledIcons, 4 , 1, COLOR_ICONS, DAYLY);
         break;
     case icons::MIN_T:
-        drowLedSegment(ledIcons, 5 , 1, CRGB::AliceBlue, DAYLY);
+        drowLedSegment(ledIcons, 5 , 1, COLOR_ICONS, DAYLY);
         break;
     case icons::SWITCH_BUTTON:
-        drowLedSegment(ledIcons, 2 , 2, CRGB::AliceBlue, DAYLY);
+        drowLedSegment(ledIcons, 2 , 2, COLOR_ICONS, DAYLY);
         break;
     case icons::STAT_BUTTON:
-        drowLedSegment(ledIcons, 0 , 2, CRGB::AliceBlue, DAYLY);
+        drowLedSegment(ledIcons, 0 , 2, COLOR_ICONS, DAYLY);
         break;
     case icons::ALL:
-        drowLedSegment(ledIcons, 0 , 14, CRGB::AliceBlue, NIGHTLY);
+        drowLedSegment(ledIcons, 0 , 14, COLOR_ICONS, NIGHTLY);
         break;
     case icons::FADE_ALL:
-        drowLedSegment(ledIcons, 0 , 14, CRGB::Black, OFF);
+        drowLedSegment(ledIcons, 0 , 14, COLOR_BLACK, OFF);
         break;
     default:
-        drowLedSegment(ledIcons, 0 , 14, CRGB::Black, OFF);
+        drowLedSegment(ledIcons, 0 , 14, COLOR_BLACK, OFF);
         break;
     }
 }
 
-void ClockDisplay::attachFastLED(CFastLED &fLED){
-    CurFastLED = fLED;
+void ClockDisplay::attachSetLedColor(void (*func)(byte, byte, byte)){
+    setLedColor = func;
 }
 
-void ClockDisplay::attachMainLedsArray(CRGB lesArray[]){
-    mainLedsArray = lesArray;
+void ClockDisplay::attachSetLedIconColor(void (*func)(byte, byte, byte)){
+    setLedIconColor = func;
 }
-void ClockDisplay::attachIconLedsArray(CRGB lesArray[]){
-    iconLedsArray = lesArray;
+
+void ClockDisplay::attachShowMainLed(void (*func)()){
+    showMainLed = func;
 }
+
+void ClockDisplay::attachShowIconLed(void (*func)()){
+    showIconLed = func;
+}
+

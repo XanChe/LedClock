@@ -1,8 +1,6 @@
 #ifndef ClockDisplay_h
 #define ClockDisplay_h
 #include <Arduino.h>
-
-#include <FastLED.h>
 #include <Tytedefs.h>
 
 #define NUM_LEDS 88     
@@ -47,45 +45,47 @@ const byte numbers[] = {
     };
 
 
-
 class ClockDisplay
 {
 private:
      
-
+    byte static const COLOR_BLACK = 0;
+    byte static const COLOR_ICONS = 155;
     LedPixel ledIcons[NUM_ICON_LEDS];   // масив, что и как отрисовывать на основном дисплее. Сюда всё рисуется
     LedPixel ledMain[NUM_LEDS];         // тоже самае для иконок
 
-    CRGB *mainLedsArray;    // ссылка на массив светодиодов, тот же, что привязывается и FstLED 
-    CRGB *iconLedsArray;    // тоже самае для иконок   
+     // тоже самае для иконок   
     
     DisplaySettings displaySettings;
      
-    CFastLED CurFastLED;
-    
+   // CustomLED CurFastLED;
+    void (*setLedColor)(byte index, byte color, byte brigth);
+    void (*setLedIconColor)(byte index, byte color, byte brigth);
+    void (*showMainLed)();
+    void (*showIconLed)();
     /**
      * Методы отрисовки отдельных элементов на главном дисплее
      * */
     void clearDispley();
     void clearIcons();
-    void drowLedSegment(LedPixel ledArray[], byte start, byte count, CRGB color, showingLedEffects effect, bool isShowed = true);
+    void drowLedSegment(LedPixel ledArray[], byte start, byte count, byte color, showingLedEffects effect, bool isShowed = true);
     void drowNumber(int startindex, byte number, showingLedEffects effect = DAYLY);
     void drowHour(byte hour, showingLedEffects effect = DAYLY);
     void drowMinutes(byte minutes, showingLedEffects effect = DAYLY);        
     void drowDotes(showingLedEffects effect = BLINK);
     void drowSign();        
-    void fillNubreByColorPallete(byte start, byte colorIndex, CRGB colorPallete[]);
-    void fillColorThreeHorizonLines(byte start, byte colorIndex, CRGB colorPallete[]);
-    void fillColorToLedSegment(LedPixel ledArray[], byte start, byte count, CRGB color);
+   /* void fillNubreByColorPallete(byte start, byte colorIndex, LedData colorPallete[]);
+    void fillColorThreeHorizonLines(byte start, byte colorIndex, LedData colorPallete[]);*/
+    void fillColorToLedSegment(LedPixel ledArray[], byte start, byte count, byte color);
     void drowIcon(icons icon);
 
     
      /**
      * Методы генерации итогового состояния светодидов для FastLED и отправка отрисованного на ленту
      * */
-    CRGB applyPixelEffect(LedPixel ledPixel);
-    void render(CRGB displayLed[]);
-    void renderIcons(CRGB displayLed[]);
+    byte applyPixelEffect(LedPixel ledPixel);
+    void renderStrip(byte brigth = 0);
+    void renderIconStrip(byte brigth = 0);
     
         
 public:   
@@ -101,10 +101,14 @@ public:
     void setSettings(DisplaySettings settings){
         displaySettings = settings;
     }
-    
-    void attachFastLED(CFastLED &fLED);
-    void attachMainLedsArray(CRGB lesArray[]);
-    void attachIconLedsArray(CRGB lesArray[]);
+    void attachSetLedColor(void (*func)(byte, byte, byte));
+    void attachSetLedIconColor(void (*func)(byte, byte, byte));
+    void attachShowMainLed(void (*func)());
+    void attachShowIconLed(void (*func)());
+   /*
+    void attachFastLED(CustomLED &fLED);
+    void attachMainLedsArray(LedData lesArray[]);
+    void attachIconLedsArray(LedData lesArray[]);*/
     /**
      * Комплексная отрисовка для каждого из режимов
      * */
@@ -114,7 +118,7 @@ public:
     void drowMenuTimeOnDispley(byte hour, byte minutes, menuStates st);
      // рисуем иконки 
     void drowTemperatureOnDispley(int t, icons ic);        
-    void drowColorPallete(int8_t hue);
+    //void drowColorPallete(int8_t hue);
     void clear();
     void periodicalRender(byte brigth = 0);
     void render(byte brigth = 0);

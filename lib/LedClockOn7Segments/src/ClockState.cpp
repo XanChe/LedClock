@@ -1,7 +1,5 @@
 #include <ClockState.h>
 
-
-
 ClockState::ClockState(clockStates st)
 {
     changeStateTo(st);

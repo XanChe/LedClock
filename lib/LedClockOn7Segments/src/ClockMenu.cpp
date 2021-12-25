@@ -103,18 +103,11 @@ void ClockMenu::decreaseMinute(){
 void ClockMenu::increaseMinute(){
     if(++minute > 59) minute = 0;
 }
-void ClockMenu::decreaseColor(CHSV &color){
-    int hue = color.hue;
-    if(--hue < 0) hue = 192;
-    color = CHSV(hue, 255, 255);   
+void ClockMenu::decreaseColor(int8_t &color){    
+    if(--color < 0) color = 255;       
 }
-void ClockMenu::increaseColor(CHSV &color){
-    int hue = color.hue;
-    if(++hue > 192) hue = 0;
-#ifdef DEBAG
-    Serial.println(hue);
-#endif
-    color = CHSV(hue, 255, 255);
+void ClockMenu::increaseColor(int8_t &color){    
+    if(++color > 255) color = 0;
 }
 void ClockMenu::decreaseBrightness(){
     if(settings->brightness > 15) settings->brightness--;

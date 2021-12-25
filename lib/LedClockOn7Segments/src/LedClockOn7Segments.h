@@ -78,18 +78,19 @@ public:
      * Методы нужные для привязки конкретного железа с наружи библиотеки
      * 
      * */
-    void attachFastLED(CFastLED &fLED);  
     void attachGetTimeFunction(void (*func)());
     void attachSetTimeToHarwareFunction(void (*func)(byte, byte, byte));
     void attachRequestTempFunction(void (*func)());
-    void attachGetAnswerTempFunction(void (*func)());
-    void attachMainLedsArray(CRGB ledArray[]);
-    void attachIconLedsArray(CRGB ledArray[]);
+    void attachGetAnswerTempFunction(void (*func)());   
     
     void setCurTime(byte day, byte hour, byte minutes, byte seconds);
     void setCurentIndoorTemperature(char t);
     void setCurentOutdoorTemperature(char t);
 
+    void attachSetLedColor(void (*func)(byte, byte, byte));
+    void attachSetLedIconColor(void (*func)(byte, byte, byte));
+    void attachShowMainLed(void (*func)());
+    void attachShowIconLed(void (*func)());
     /**
      * интерфес управления часами
      * */

@@ -2,7 +2,6 @@
 #define ClockMenu_h
 #include <Arduino.h>
 #include <LibEnums.h>
-#include <FastLED.h>
 #include <Tytedefs.h>
 
 class ClockMenu
@@ -18,8 +17,8 @@ private:
     void increaseHour();
     void decreaseMinute();
     void increaseMinute();
-    void decreaseColor(CHSV &color);
-    void increaseColor(CHSV &color);
+    void decreaseColor(int8_t &color);
+    void increaseColor(int8_t &color);
     void decreaseBrightness();
     void increaseBrightness();
 

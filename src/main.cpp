@@ -1,5 +1,5 @@
 #define FASTLED_ALLOW_INTERRUPTS 0
-//#define DEBAG
+#define DEBAG
 #ifdef DEBAG 
 #define logg(x) Serial.println(x)
 #else
@@ -16,6 +16,10 @@
 #include "microDS3231.h"// для работы с модулем реального времени
 #include <EncButton.h>
 
+#define COLOR_DEBTH 2
+
+#include <microLED.h> 
+
 #define CLK 3   // куда подключать энкодер
 #define DT 4    // ---
 #define SW 5    // ---
@@ -30,8 +34,10 @@ EncButton<EB_TICK, A3> btnSwitchMode;
 RH_NRF905 nrf905;
 MicroDS18B20<A0> sensor;
 
-CRGBArray<NUM_LEDS> leds;
-CRGBArray<NUM_ICON_LEDS> ledIcons;
+microLED<NUM_LEDS, DATA_PIN, MLED_NO_CLOCK, LED_WS2818, ORDER_GRB, CLI_AVER, SAVE_MILLIS> stripMain;
+microLED<NUM_ICON_LEDS, DATA_ICON_PIN, MLED_NO_CLOCK, LED_WS2818, ORDER_GRB, CLI_AVER, SAVE_MILLIS> stripIcons;
+/*CRGBArray<NUM_LEDS> leds;
+CRGBArray<NUM_ICON_LEDS> ledIcons;*/
 
 void configurateFastLED();
 void configurateLedClock();
@@ -40,6 +46,11 @@ void configurateSensors();
 
 void updateTime();
 void saveTime(byte, byte, byte);
+
+void setCustomLed(byte, byte, byte);
+void setCustomIconLed(byte, byte, byte);
+void showMainStrip();
+void showIconStrip();
 
 void requestTemp();
 void getAnswerTemp();
@@ -50,6 +61,7 @@ void clickSwitchMenu();
 void clickStatsButton();
 void checkRemoteSensor();
 void controlInspection();
+
 
 void setup() {
     Serial.begin(9600);
@@ -71,8 +83,7 @@ void setup() {
 void loop() {
     checkRemoteSensor();
     controlInspection();
-    ledClock.tick();
-    
+    ledClock.tick();     
 }
 void controlInspection(){
     
@@ -133,20 +144,37 @@ void configurateSensors(){
 }
 
 void configurateFastLED(){
-    FastLED.addLeds<WS2811, DATA_PIN, GRB>(leds, NUM_LEDS);
+    /*FastLED.addLeds<WS2811, DATA_PIN, GRB>(leds, NUM_LEDS);
     FastLED.addLeds<WS2811, DATA_ICON_PIN, GRB>(ledIcons, NUM_ICON_LEDS);
     FastLED.setBrightness( 15 );
     FastLED.setTemperature( TEMPERATURE_1 );
-    FastLED.setMaxPowerInVoltsAndMilliamps(5, 500);
+    FastLED.setMaxPowerInVoltsAndMilliamps(5, 500);*/
+    stripMain.setBrightness(60);
+    stripIcons.setBrightness(60);
 }
 
 void configurateLedClock(){
-    ledClock.attachFastLED(FastLED);
-    ledClock.attachMainLedsArray(leds);
-    ledClock.attachIconLedsArray(ledIcons);
+    ledClock.attachSetLedColor(setCustomLed);
+    ledClock.attachSetLedIconColor(setCustomIconLed);
+    ledClock.attachShowMainLed(showMainStrip);
+    ledClock.attachShowIconLed(showIconStrip);
     ledClock.attachGetTimeFunction(updateTime);
     ledClock.attachRequestTempFunction(requestTemp);
     ledClock.attachGetAnswerTempFunction(getAnswerTemp);
+}
+
+void setCustomLed(byte index, byte color, byte brigth){
+    stripMain.set(index, mWheel8(color, brigth));
+}
+
+void setCustomIconLed(byte index, byte color, byte brigth){
+    stripIcons.set(index, mWheel8(color, brigth));
+}
+void showMainStrip(){    
+    stripMain.show();
+}
+void showIconStrip(){    
+    stripIcons.show();
 }
 
 void updateTime(){  

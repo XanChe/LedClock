@@ -61,15 +61,15 @@ void LedClockOn7Segments::drowMenuState(){
         break;
     case MENU_COLOR:
         display.drowTimeOnDispley(menu->getHour(), menu->getMinute());
-        display.drowColorPallete(menu->getSettings().clockColor.hue);        
+        //display.drowColorPallete(menu->getSettings().clockColor);        
         break;
     case MENU_PLUS_COLOR:        
         display.drowTemperatureOnDispley(35, icons::FADE_ALL);
-        display.drowColorPallete(menu->getSettings().plusZeroColor.hue);  
+        //display.drowColorPallete(menu->getSettings().plusZeroColor);  
         break;
     case MENU_SUB_COLOR:        
         display.drowTemperatureOnDispley(-35, icons::FADE_ALL);
-        display.drowColorPallete(menu->getSettings().subZeroColor.hue);
+        //display.drowColorPallete(menu->getSettings().subZeroColor);
         break; 
     case MENU_BRIGHTNESS:        
         display.drowTimeOnDispley(menu->getHour(), menu->getMinute());
@@ -115,19 +115,30 @@ void LedClockOn7Segments::tick(){
     display.periodicalRender();
    
 }
-
+void LedClockOn7Segments::attachSetLedColor(void (*func)(byte, byte, byte)){
+    display.attachSetLedColor(func);
+}
+void LedClockOn7Segments::attachSetLedIconColor(void (*func)(byte, byte, byte)){
+    display.attachSetLedIconColor(func);
+}
+void LedClockOn7Segments::attachShowMainLed(void (*func)()){
+    display.attachShowMainLed(func);
+}
+void LedClockOn7Segments::attachShowIconLed(void (*func)()){
+    display.attachShowIconLed(func);
+}
 void LedClockOn7Segments::saveSettings(DisplaySettings diaplaySettings){
-    Settings settings = Settings(diaplaySettings.clockColor.hue, diaplaySettings.subZeroColor.hue, diaplaySettings.plusZeroColor.hue, diaplaySettings.brightness);
+    Settings settings = Settings(diaplaySettings.clockColor, diaplaySettings.subZeroColor, diaplaySettings.plusZeroColor, diaplaySettings.brightness);
     settings.save();
 }
 
 DisplaySettings LedClockOn7Segments::loadSettings(){
-    Settings settings = Settings(HUE_GREEN, HUE_BLUE, HUE_RED, 20);
+    Settings settings = Settings(55, 66, 77, 20);
     settings.load();
     DisplaySettings loadedSettings;
-    loadedSettings.clockColor = CHSV(settings.getClockColorHue(), 255, 255);
-    loadedSettings.subZeroColor = CHSV(settings.getSuZeroColorHue(), 255, 255);
-    loadedSettings.plusZeroColor = CHSV(settings.getPlusZeroColorHue(), 255, 255);
+    loadedSettings.clockColor = settings.getClockColor();
+    loadedSettings.subZeroColor =settings.getSuZeroColor();
+    loadedSettings.plusZeroColor = settings.getPlusZeroColor();
     loadedSettings.brightness = settings.getBrightness();
     return loadedSettings;
 }
@@ -147,19 +158,6 @@ void LedClockOn7Segments::attachRequestTempFunction(void (*func)()){
 void LedClockOn7Segments::attachGetAnswerTempFunction(void (*func)()){
     getAnswerTempCallbackFunction = func;
 }
-
-void LedClockOn7Segments::attachMainLedsArray(CRGB ledArray[]){
-    display.attachMainLedsArray(ledArray);
-}
-
-void LedClockOn7Segments::attachIconLedsArray(CRGB ledArray[]){
-    display.attachIconLedsArray(ledArray);
-}
-
-void LedClockOn7Segments::attachFastLED(CFastLED &fLED){
-    display.attachFastLED(fLED);
-}
-
 
 bool LedClockOn7Segments::drowTemperatureIfCan(TemperatureSensorStats *tStats){
     if(tStats != NULL && tStats->canBeShowed(curentDateTimeInMinutes)){

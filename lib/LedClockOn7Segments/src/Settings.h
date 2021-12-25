@@ -6,9 +6,9 @@ class Settings
 {
 private:
     
-    int8_t clockColorHue;
-    int8_t subZeroColorHue;
-    int8_t plusZeroColorHue;
+    int8_t clockColor;
+    int8_t subZeroColor;
+    int8_t plusZeroColor;
     int8_t brightness;
     
     void EEPROMWriteInt(int p_address, int p_value){
@@ -28,39 +28,39 @@ private:
     }
 public:
     Settings(int8_t clockColorHui, int8_t subZeroColorHue, int8_t plusZeroColorHue, int8_t brightnes){
-        this->clockColorHue = clockColorHui;
-        this->subZeroColorHue = subZeroColorHue;
-        this->plusZeroColorHue = plusZeroColorHue;
+        this->clockColor = clockColorHui;
+        this->subZeroColor = subZeroColorHue;
+        this->plusZeroColor = plusZeroColorHue;
         this->brightness = brightnes;
 
     }   
     void save(){
         EEPROMWriteInt(0,27575);
-        EEPROMWriteInt(2,clockColorHue);
-        EEPROMWriteInt(4,subZeroColorHue);
-        EEPROMWriteInt(6,plusZeroColorHue);
+        EEPROMWriteInt(2,clockColor);
+        EEPROMWriteInt(4,subZeroColor);
+        EEPROMWriteInt(6,plusZeroColor);
         EEPROMWriteInt(8,brightness);
 
     }
     void load(){
         if(EEPROMReadInt(0) == 27575){
-            this->clockColorHue =  EEPROMReadInt(2);
-            this->subZeroColorHue = EEPROMReadInt(4);
-            this->plusZeroColorHue = EEPROMReadInt(6);
+            this->clockColor =  EEPROMReadInt(2);
+            this->subZeroColor = EEPROMReadInt(4);
+            this->plusZeroColor = EEPROMReadInt(6);
             this->brightness = EEPROMReadInt(8);
         }else{
             save();
         }
         
     }
-    int8_t getClockColorHue(){
-        return clockColorHue;
+    int8_t getClockColor(){
+        return clockColor;
     }
-    int8_t getSuZeroColorHue(){
-        return subZeroColorHue;
+    int8_t getSuZeroColor(){
+        return subZeroColor;
     }
-    int8_t getPlusZeroColorHue(){
-        return plusZeroColorHue;
+    int8_t getPlusZeroColor(){
+        return plusZeroColor;
     }
     int8_t getBrightness(){
         return brightness;
