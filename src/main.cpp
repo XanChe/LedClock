@@ -49,8 +49,8 @@ void saveTime(byte, byte, byte);
 
 void setCustomLed(byte, byte, byte);
 void setCustomIconLed(byte, byte, byte);
-void showMainStrip();
-void showIconStrip();
+void showMainStrip(byte);
+void showIconStrip(byte);
 
 void requestTemp();
 void getAnswerTemp();
@@ -62,7 +62,7 @@ void clickStatsButton();
 void checkRemoteSensor();
 void controlInspection();
 
-
+//------------------
 void setup() {
     Serial.begin(9600);
 
@@ -71,20 +71,26 @@ void setup() {
     configurateSensors();
     configurateFastLED();
     configurateLedClock();
-    /*
-    updateTime();   
-    ledClock.setCurentOutdoorTemperature(-15);
-    delay(1000);
-    updateTime();
-    ledClock.setCurentOutdoorTemperature(-15);*/
+    /*for(byte i = 0; i<24; i++){
+        EEPROM.write(12 + i * 2, 8);
+        EEPROM.write(12 + i * 2 + 1, 248);
+        
+    }
+    for(byte i = 0; i<24; i++){
+        EEPROM.write(60 + i * 2, 8);
+        EEPROM.write(60 + i * 2 + 1, 248);
+        
+    }*/
     delay(1000);
 }
-
+//------------------
 void loop() {
     checkRemoteSensor();
     controlInspection();
     ledClock.tick();     
 }
+//--------------------
+
 void controlInspection(){
     
     
@@ -144,11 +150,7 @@ void configurateSensors(){
 }
 
 void configurateFastLED(){
-    /*FastLED.addLeds<WS2811, DATA_PIN, GRB>(leds, NUM_LEDS);
-    FastLED.addLeds<WS2811, DATA_ICON_PIN, GRB>(ledIcons, NUM_ICON_LEDS);
-    FastLED.setBrightness( 15 );
-    FastLED.setTemperature( TEMPERATURE_1 );
-    FastLED.setMaxPowerInVoltsAndMilliamps(5, 500);*/
+    
     stripMain.setBrightness(60);
     stripIcons.setBrightness(60);
 }
@@ -159,6 +161,7 @@ void configurateLedClock(){
     ledClock.attachShowMainLed(showMainStrip);
     ledClock.attachShowIconLed(showIconStrip);
     ledClock.attachGetTimeFunction(updateTime);
+    ledClock.attachSetTimeToHarwareFunction(saveTime);
     ledClock.attachRequestTempFunction(requestTemp);
     ledClock.attachGetAnswerTempFunction(getAnswerTemp);
 }
@@ -170,10 +173,13 @@ void setCustomLed(byte index, byte color, byte brigth){
 void setCustomIconLed(byte index, byte color, byte brigth){
     stripIcons.set(index, mWheel8(color, brigth));
 }
-void showMainStrip(){    
+void showMainStrip(byte bright){ 
+    // logg(bright);
+    stripMain.setBrightness(bright);   
     stripMain.show();
 }
-void showIconStrip(){    
+void showIconStrip(byte bright){ 
+    stripIcons.setBrightness(bright);   
     stripIcons.show();
 }
 
@@ -181,7 +187,7 @@ void updateTime(){
     ledClock.setCurTime((byte)rtc.getDay(), (byte)rtc.getHours(), (byte)rtc.getMinutes(), (byte)rtc.getSeconds());
 }
 
-void saveTime(byte hour, byte minute, byte second){
+void saveTime(byte hour, byte minute, byte second){    
     rtc.setTime(second, minute, hour, rtc.getDay(),rtc.getMonth(), rtc.getYear());
 }
 

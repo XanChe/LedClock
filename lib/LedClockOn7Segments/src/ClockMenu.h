@@ -9,6 +9,7 @@ class ClockMenu
 private:
     byte hour;
     byte minute;      
+    byte dColor = 1;
 
     DisplaySettings *settings;
     menuStates menuState = MENU_HOUR;
@@ -24,7 +25,7 @@ private:
 
 public:
     
-    ClockMenu(DisplaySettings *settings);
+    ClockMenu(DisplaySettings* settings, byte hour, byte minute);
     
     void increseValue();
     void decreaseValue();
@@ -37,10 +38,12 @@ public:
     byte getMinute(){
         return minute;
     }    
-    
+    void setdColor(byte delta = 1){
+        dColor = delta;
+    }
   //  CHSV getCurrentColor();
-    DisplaySettings getSettings(){
-        return *settings;
+    DisplaySettings* getSettings(){
+        return settings;
     }
 };
 

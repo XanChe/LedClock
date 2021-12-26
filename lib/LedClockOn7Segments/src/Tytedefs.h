@@ -11,11 +11,23 @@ struct DisplaySettings{
 };*/
 
 struct DisplaySettings{
-    int8_t brightness = 20;
+    int8_t brightness = 60;
     int8_t subZeroColor = 0;       // цвет отрисовки температуры 
     int8_t plusZeroColor = 20;    // цвет отрисовки температуры
     int8_t clockColor = 150;        // цвет отрисовки времени 
     int8_t custormColor = 43;
+    DisplaySettings operator=(DisplaySettings const &other){
+        brightness = other.brightness;
+        subZeroColor = other.subZeroColor;
+        plusZeroColor = other.plusZeroColor;
+        clockColor = other.clockColor;
+        custormColor = other.custormColor;
+        return *this;
+    }
+    int8_t getBrightness(){
+        if(brightness < 60) brightness = 60;
+        return brightness;
+    }
 };
 
 struct LedPixel{

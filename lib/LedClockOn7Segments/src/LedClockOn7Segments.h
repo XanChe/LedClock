@@ -13,7 +13,8 @@ class LedClockOn7Segments{
 private:
     /**
      *  текущее время
-     * */        
+     * */
+            
     byte curentHour = 0;
     byte curentMinute = 0;
     byte curentSecond = 0;
@@ -24,7 +25,7 @@ private:
     TemperatureSensorStats *indoorStats = NULL;      // Тоже самое для датчика на борту
     
     DisplaySettings displaySettings;
-    ClockDisplay display = ClockDisplay(displaySettings);
+    ClockDisplay display;
 
     unsigned long cronCounter = 0; // счетчик циклов, условно - длится 50 млс. 
                                     // нужен для распределения циклических операций во времени
@@ -37,6 +38,7 @@ private:
     unsigned long mil =0; // нужен для инкримента cronCounter каждые 50 млс
 
     clockStates state = CUR_TIME; // текущее состояние часов
+    statMode temperatureMode = CURRENT_T_MODE;
     unsigned long stateStartMilles = 0; // когда часы перешли в тек. состояние
     byte workPeriodInSeconds = 15; // сколько положено работать в тек. состоянии
 
@@ -51,11 +53,12 @@ private:
      * */  
     void changeStateTo(clockStates st, byte worckDuration = 15); 
     clockStates changeNextAvailable();
+    statMode changeNextStstMode();
     clockStates getClockState();
     bool checkStateAvailable(clockStates st);
 
   
-    bool drowTemperatureIfCan(TemperatureSensorStats *tStats);
+    bool drowTemperatureIfCan(TemperatureSensorStats *tStats, statMode mode = CURRENT_T_MODE);
     
     bool isMenuMode();
 
@@ -71,9 +74,10 @@ private:
     void exitFromMenu();
     void saveSettings(DisplaySettings settings);
     DisplaySettings loadSettings();
-
+    void freeMenu();
 public:
     LedClockOn7Segments();
+    ~LedClockOn7Segments();
     /**
      * Методы нужные для привязки конкретного железа с наружи библиотеки
      * 
@@ -84,13 +88,16 @@ public:
     void attachGetAnswerTempFunction(void (*func)());   
     
     void setCurTime(byte day, byte hour, byte minutes, byte seconds);
+
+
+
     void setCurentIndoorTemperature(char t);
     void setCurentOutdoorTemperature(char t);
 
     void attachSetLedColor(void (*func)(byte, byte, byte));
     void attachSetLedIconColor(void (*func)(byte, byte, byte));
-    void attachShowMainLed(void (*func)());
-    void attachShowIconLed(void (*func)());
+    void attachShowMainLed(void (*func)(byte));
+    void attachShowIconLed(void (*func)(byte));
     /**
      * интерфес управления часами
      * */

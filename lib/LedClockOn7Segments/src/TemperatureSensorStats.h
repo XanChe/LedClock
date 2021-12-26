@@ -13,16 +13,17 @@ private:
     icons icon;
     byte stratIndOnFlesh = 0;
     char currentHour = 0;    
-    char currentTmeperature = -120;
-    char currentMaxT = -120;
-    char currentMinT = 120;
+    int currentTmeperature = -120;
+    int currentMaxT = -120;
+    int currentMinT = 120;
    /* char maxTemperatureStatsArray[24]; 
     char minTemperatureStatsArray[24]; */
     void saveCurrentHourStats();
+    int readFromEEPROM(byte index);
 public:
     TemperatureSensorStats(icons ic, byte startInd);
     
-    void putCurrentTemperature(unsigned long dateTimeInMinutes, byte hour, byte minute, char temperature);
+    void putCurrentTemperature(unsigned long dateTimeInMinutes, byte hour, byte minute, int temperature);
     int getMaxtemperature();
     int getMintemperature();
     int getCurentTemperature();

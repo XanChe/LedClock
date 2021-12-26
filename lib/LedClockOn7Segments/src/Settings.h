@@ -20,7 +20,7 @@ private:
         }
 
 //This function will read a 2 byte integer from the eeprom at the specified address and address + 1
-    byte EEPROMReadInt(int p_address){
+    int EEPROMReadInt(int p_address){
         byte lowByte = EEPROM.read(p_address);
         byte highByte = EEPROM.read(p_address + 1);
 

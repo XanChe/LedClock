@@ -1,8 +1,10 @@
 #include <ClockMenu.h>
 
-ClockMenu::ClockMenu(DisplaySettings *settings)
+ClockMenu::ClockMenu(DisplaySettings* settings, byte hour, byte minute)
 {
     this->settings = settings;
+    this->hour = hour;
+    this->minute = minute;
 }
 menuStates ClockMenu::nextMenu(){
     switch (menuState)
@@ -104,13 +106,16 @@ void ClockMenu::increaseMinute(){
     if(++minute > 59) minute = 0;
 }
 void ClockMenu::decreaseColor(int8_t &color){    
-    if(--color < 0) color = 255;       
+    int tColor = color - dColor;
+    if(tColor < 0) tColor += 255; 
+    color = tColor % 255;    
 }
 void ClockMenu::increaseColor(int8_t &color){    
-    if(++color > 255) color = 0;
+    int tColor = color + dColor;
+    color = tColor % 255;
 }
 void ClockMenu::decreaseBrightness(){
-    if(settings->brightness > 15) settings->brightness--;
+    if(settings->brightness > 60) settings->brightness--;
 }
 void ClockMenu::increaseBrightness(){
     if(settings->brightness < 255) settings->brightness++;

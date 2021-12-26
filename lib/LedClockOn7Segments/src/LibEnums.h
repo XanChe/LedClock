@@ -45,5 +45,9 @@ enum icons {
     FADE_ALL,
 };
 
-
+enum statMode {
+    CURRENT_T_MODE,
+    MAX_T_MODE,
+    MIN_T_MODE,
+};
 #endif

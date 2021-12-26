@@ -18,6 +18,7 @@
 
 #define CHAR_UP_ZERO 10
 #define CHAR_C 11
+#define CHAR_DOWN_ZERO 12
 
 /**
  *       ---
@@ -42,6 +43,7 @@ const byte numbers[] = {
         0b01111011, // 9 
         0b01111000, // CHAR_UP_ZERO
         0b01100110, // CHAR_C
+        0b00001111, // CHAR_DOWN_ZERO
     };
 
 
@@ -56,55 +58,52 @@ private:
 
      // тоже самае для иконок   
     
-    DisplaySettings displaySettings;
+    DisplaySettings settings;
      
    // CustomLED CurFastLED;
     void (*setLedColor)(byte index, byte color, byte brigth);
     void (*setLedIconColor)(byte index, byte color, byte brigth);
-    void (*showMainLed)();
-    void (*showIconLed)();
+    void (*showMainLed)(byte);
+    void (*showIconLed)(byte);
     /**
      * Методы отрисовки отдельных элементов на главном дисплее
      * */
     void clearDispley();
     void clearIcons();
     void drowLedSegment(LedPixel ledArray[], byte start, byte count, byte color, showingLedEffects effect, bool isShowed = true);
-    void drowNumber(int startindex, byte number, showingLedEffects effect = DAYLY);
+    void drowNumber(byte startindex, byte number, showingLedEffects effect = DAYLY);
     void drowHour(byte hour, showingLedEffects effect = DAYLY);
     void drowMinutes(byte minutes, showingLedEffects effect = DAYLY);        
     void drowDotes(showingLedEffects effect = BLINK);
     void drowSign();        
-   /* void fillNubreByColorPallete(byte start, byte colorIndex, LedData colorPallete[]);
-    void fillColorThreeHorizonLines(byte start, byte colorIndex, LedData colorPallete[]);*/
+    void fillNubreByColorPallete(byte start, byte colorIndex, byte colorPallete[]);
+    void fillColorThreeHorizonLines(byte start, byte colorIndex, byte colorPallete[]);
     void fillColorToLedSegment(LedPixel ledArray[], byte start, byte count, byte color);
-    void drowIcon(icons icon);
+    
 
     
      /**
      * Методы генерации итогового состояния светодидов для FastLED и отправка отрисованного на ленту
      * */
     byte applyPixelEffect(LedPixel ledPixel);
-    void renderStrip(byte brigth = 0);
-    void renderIconStrip(byte brigth = 0);
+    void renderStrip();
+    void renderIconStrip();
     
         
 public:   
     unsigned long cronCounter = 0; // счетчик циклов, условно - длится 50 млс.
-    ClockDisplay(DisplaySettings settings){
-        displaySettings = settings;
-    }
-
+    ClockDisplay(){}
     void tick(){
         cronCounter++;
     }
 
     void setSettings(DisplaySettings settings){
-        displaySettings = settings;
+        this->settings = settings;
     }
     void attachSetLedColor(void (*func)(byte, byte, byte));
     void attachSetLedIconColor(void (*func)(byte, byte, byte));
-    void attachShowMainLed(void (*func)());
-    void attachShowIconLed(void (*func)());
+    void attachShowMainLed(void (*func)(byte));
+    void attachShowIconLed(void (*func)(byte));
    /*
     void attachFastLED(CustomLED &fLED);
     void attachMainLedsArray(LedData lesArray[]);
@@ -117,8 +116,10 @@ public:
     void drowTimeOnDispley( byte hour, byte minutes, showingLedEffects effect = DAYLY);
     void drowMenuTimeOnDispley(byte hour, byte minutes, menuStates st);
      // рисуем иконки 
-    void drowTemperatureOnDispley(int t, icons ic);        
-    //void drowColorPallete(int8_t hue);
+    void drowTemperatureOnDispley(int t, icons ic);    
+    void drowIcon(icons icon);
+    void drowSettingsBtigthOnDispley();    
+    void drowColorPallete(int8_t color);
     void clear();
     void periodicalRender(byte brigth = 0);
     void render(byte brigth = 0);

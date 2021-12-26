@@ -28,10 +28,7 @@ clockStates ClockState::changeNextAvailable(){
 
 }
 
-void ClockState::changeStateTo(clockStates st, byte worckDuration){
-    if(st == MENU_HOUR) {
-        //startMenu();
-    }
+void ClockState::changeStateTo(clockStates st, byte worckDuration){   
     stateStartMilles = millis();
     workPeriodInSeconds = worckDuration;
     state = st;
