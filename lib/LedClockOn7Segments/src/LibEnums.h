@@ -29,6 +29,7 @@ enum menuStates {
 
 enum showingLedEffects {
     DAYLY,
+    DAYLY_CORRECT,
     NIGHTLY,
     BLINK,
     OFF,

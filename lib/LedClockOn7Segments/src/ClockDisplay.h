@@ -90,7 +90,7 @@ private:
      /**
      * Методы генерации итогового состояния светодидов для FastLED и отправка отрисованного на ленту
      * */
-    byte applyPixelEffect(LedPixel ledPixel);
+    void applyPixelEffect(byte index,LedPixel ledPixel, void (*func)(byte, byte, byte));
     void renderStrip();
     void renderIconStrip();
     

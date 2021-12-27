@@ -1,5 +1,5 @@
 #define FASTLED_ALLOW_INTERRUPTS 0
-#define DEBAG
+//#define DEBAG
 #ifdef DEBAG 
 #define logg(x) Serial.println(x)
 #else
@@ -166,15 +166,15 @@ void configurateLedClock(){
     ledClock.attachGetAnswerTempFunction(getAnswerTemp);
 }
 
-void setCustomLed(byte index, byte color, byte brigth){
+void setCustomLed(byte index, byte color, byte brigth){   
+    
     stripMain.set(index, mWheel8(color, brigth));
 }
 
-void setCustomIconLed(byte index, byte color, byte brigth){
+void setCustomIconLed(byte index, byte color, byte brigth){    
     stripIcons.set(index, mWheel8(color, brigth));
 }
 void showMainStrip(byte bright){ 
-    // logg(bright);
     stripMain.setBrightness(bright);   
     stripMain.show();
 }

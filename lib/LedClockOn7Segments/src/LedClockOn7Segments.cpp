@@ -321,7 +321,6 @@ void LedClockOn7Segments::statsButtonClick(){
 }
 
 void LedClockOn7Segments::menuButtonClick(){    
-    Serial.println("Menu");
     if(menu == NULL){
         freeSensorStats();
         menu = new ClockMenu(&displaySettings, curentHour, curentMinute); 
@@ -357,9 +356,6 @@ void LedClockOn7Segments::menuNextButtonClick(){
 }
 
 void LedClockOn7Segments::menuPlusButtonClick(){
-#ifdef DEBAG
-    Serial.println("PLus");
-#endif
     if(menu != NULL){
         changeStateTo(MENU, 30);        
         menu->increseValue();  
@@ -371,9 +367,6 @@ void LedClockOn7Segments::menuPlusButtonClick(){
     }
 }
 void LedClockOn7Segments::menuMinusButtonClick(){
-#ifdef DEBAG
-    Serial.println("Minus");
-#endif
     if(menu != NULL){
         changeStateTo(MENU, 30);
         menu->decreaseValue();  
@@ -403,9 +396,6 @@ statMode LedClockOn7Segments::changeNextStstMode(){
 }
 
 clockStates LedClockOn7Segments::changeNextAvailable(){
-#ifdef DEBAG   
-    Serial.println(state);
-#endif
     switch (state)
     {
     case CUR_TIME:

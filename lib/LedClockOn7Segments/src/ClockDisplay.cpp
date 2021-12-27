@@ -9,7 +9,7 @@ void ClockDisplay::clearDispley(){
     drowLedSegment(ledMain, 0, NUM_LEDS, 0, OFF, false);    
 }
 
-void ClockDisplay::clearIcons(){     
+void ClockDisplay::clearIcons(){ 
     drowLedSegment(ledIcons, 0, NUM_ICON_LEDS, 0, OFF, false);    
 }
 
@@ -66,10 +66,12 @@ void ClockDisplay::fillColorToLedSegment(LedPixel ledArray[], byte start, byte c
 }
 
 void ClockDisplay::drowLedSegment(LedPixel ledArray[], byte start, byte count, byte color, showingLedEffects effect, bool isShowed){
+    
     for(byte i = start; i < start + count; i++){
             ledArray[i].color = color;
             ledArray[i].isShowed = isShowed;
             ledArray[i].effect = effect;
+            
     }
 }
 
@@ -139,7 +141,7 @@ void ClockDisplay::drowHour(byte hour, showingLedEffects effect){
 
 void ClockDisplay::drowMinutes(byte minutes, showingLedEffects effect){
     drowNumber(0, minutes % 10, effect);    
-    drowNumber(SEGMENT_LED_COUNT*7, minutes / 10, effect);
+    drowNumber(SEGMENT_LED_COUNT*7, minutes / 10, effect == DAYLY ? DAYLY_CORRECT: effect);
 }
 
 void ClockDisplay::drowNumber(byte startindex, byte number, showingLedEffects effect){ 
@@ -170,50 +172,59 @@ void ClockDisplay::render(byte brigth){
     }
 }
 
-void ClockDisplay::renderStrip(){         
-    byte curColor = 0;
+void ClockDisplay::renderStrip(){  
     for(int i = 0; i < NUM_LEDS; i++){ 
-        curColor = applyPixelEffect(ledMain[i]);           
-        setLedColor(i, curColor, curColor == 0 ? 0 : 255);       
+        applyPixelEffect(i, ledMain[i], setLedColor);           
+        //setLedColor(i, curColor, curColor == 0 ? 0 : settings.brightness);       
     }        
 }
 
-void ClockDisplay::renderIconStrip(){  
-    byte curColor = 0;
+void ClockDisplay::renderIconStrip(){ 
+   
     for(int i = 0; i < NUM_ICON_LEDS; i++){
-        curColor = applyPixelEffect(ledIcons[i]);
-        setLedIconColor(i, curColor, curColor == 0 ? 0 : 255);           
+        applyPixelEffect(i, ledIcons[i],setLedIconColor);
     }           
 }
 
-byte ClockDisplay::applyPixelEffect(LedPixel ledPixel){
+void ClockDisplay::applyPixelEffect(byte index, LedPixel ledPixel,void (*func)(byte, byte, byte)){
+    byte curColor = 0;
     switch (ledPixel.effect)
     {
     case DAYLY:
-        return ledPixel.isShowed ? ledPixel.color : 0;
+        curColor = ledPixel.isShowed ? ledPixel.color : 0;
+        func(index, curColor, curColor == 0 ? 0 : 255 - settings.brghtCorrector);        
+        break;
+    case DAYLY_CORRECT:
+        curColor = ledPixel.isShowed ? ledPixel.color : 0;
+        func(index, curColor, curColor == 0 ? 0 : 255);        
         break;
     case OFF:
-        return  0;        
+         func(index, curColor, 0);       
         break;
     case SUB_ZERO:
-        return  ledPixel.isShowed ? settings.subZeroColor : 0;
+        curColor = ledPixel.isShowed ? settings.subZeroColor : 0;
+        func(index, curColor, curColor == 0 ? 0 : 255- settings.brghtCorrector);         
         break;
     case PLUS_ZERO:
-        return  ledPixel.isShowed ? settings.plusZeroColor : 0;
+        curColor = ledPixel.isShowed ? settings.plusZeroColor : 0;
+        func(index, curColor, curColor == 0 ? 0 : 255- settings.brghtCorrector);        
         break;
     case BLINK:       
-        if(cronCounter % 40 < 20) {           
-            return ledPixel.color;
+        if(cronCounter % 40 < 20) {  
+            curColor = ledPixel.color;
+            
+        }else{
+            curColor = 0;
         }
-        else{
-            return 0;
-        }
+        func(index, curColor, curColor == 0 ? 0 : 255- settings.brghtCorrector);
         break;
     case CUSTOM_COLOR:
-            return ledPixel.isShowed ? settings.iconsColor : 0;
+        curColor = ledPixel.isShowed ? settings.iconsColor : 0;
+        func(index, curColor, curColor == 0 ? 0 : 255- settings.brghtCorrector);
         break;
     default:
-        return ledPixel.color;
+        curColor = ledPixel.isShowed ? ledPixel.color : 0;
+        func(index, curColor, curColor == 0 ? 0 : 255- settings.brghtCorrector);
         break;
     }    
 }
@@ -243,7 +254,7 @@ void ClockDisplay::drowIcon(icons icon){
         drowLedSegment(ledIcons, 0 , 14, settings.iconsColor, NIGHTLY);
         break;
     case icons::FADE_ALL:
-        drowLedSegment(ledIcons, 0 , 14, COLOR_BLACK, OFF);
+        drowLedSegment(ledIcons, 0 , 14, COLOR_BLACK, OFF, false);
         break;
     default:
         drowLedSegment(ledIcons, 0 , 14, COLOR_BLACK, OFF);

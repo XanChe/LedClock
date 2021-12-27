@@ -4,6 +4,7 @@
 #include <EEPROM.h>
 struct DisplaySettings{
     int8_t brightness = 60;
+    int8_t brghtCorrector = 50;
     int8_t subZeroColor = 0;       // цвет отрисовки температуры 
     int8_t plusZeroColor = 20;    // цвет отрисовки температуры
     int8_t clockColor = 150;        // цвет отрисовки времени 
