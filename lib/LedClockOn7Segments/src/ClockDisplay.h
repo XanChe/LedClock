@@ -19,6 +19,8 @@
 #define CHAR_UP_ZERO 10
 #define CHAR_C 11
 #define CHAR_DOWN_ZERO 12
+#define CHAR_DOWN_P 13
+#define CHAR_DOWN_R 14
 
 /**
  *       ---
@@ -44,6 +46,8 @@ const byte numbers[] = {
         0b01111000, // CHAR_UP_ZERO
         0b01100110, // CHAR_C
         0b00001111, // CHAR_DOWN_ZERO
+        0b01111100, // CHAR_DOWN_P
+        0b01110101, // CHAR_DOWN_R
     };
 
 
@@ -75,7 +79,8 @@ private:
     void drowHour(byte hour, showingLedEffects effect = DAYLY);
     void drowMinutes(byte minutes, showingLedEffects effect = DAYLY);        
     void drowDotes(showingLedEffects effect = BLINK);
-    void drowSign();        
+    void drowSign();
+           
     void fillNubreByColorPallete(byte start, byte colorIndex, byte colorPallete[]);
     void fillColorThreeHorizonLines(byte start, byte colorIndex, byte colorPallete[]);
     void fillColorToLedSegment(LedPixel ledArray[], byte start, byte count, byte color);
@@ -118,6 +123,7 @@ public:
      // рисуем иконки 
     void drowTemperatureOnDispley(int t, icons ic);    
     void drowIcon(icons icon);
+    void drowVauleOnDispley(byte char1, byte char2, byte value); 
     void drowSettingsBtigthOnDispley();    
     void drowColorPallete(int8_t color);
     void clear();

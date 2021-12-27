@@ -55,6 +55,10 @@ void LedClockOn7Segments::drowClockState(){
             display.drowTimeOnDispley(curentHour, curentMinute);
             break;
         }
+    if(isButtunLightOn()){
+        display.drowIcon(STAT_BUTTON);
+        display.drowIcon(SWITCH_BUTTON);
+    }
 }
 
 void LedClockOn7Segments::drowMenuState(){
@@ -82,8 +86,18 @@ void LedClockOn7Segments::drowMenuState(){
         display.drowTemperatureOnDispley(-35, icons::FADE_ALL);
         //display.drowColorPallete(menu->getSettings().subZeroColor);
         break; 
+    case MENU_ICONS_COLOR:        
+        display.drowIcon(icons::ALL);
+        display.drowColorPallete(displaySettings.iconsColor);
+        break;
     case MENU_BRIGHTNESS:        
         display.drowSettingsBtigthOnDispley();
+        break;
+    case MENU_PERIOD:        
+        display.drowVauleOnDispley(CHAR_DOWN_P, CHAR_DOWN_R, displaySettings.periodTemp);
+        break;
+    case MENU_DURATION:        
+        display.drowVauleOnDispley(CHAR_DOWN_ZERO, CHAR_DOWN_ZERO, displaySettings.durationTemp);
         break;
     case MENU_SAVE:        
         //TODO "&"
@@ -105,19 +119,27 @@ void LedClockOn7Segments::drowCurentStateOnValueChanging(){
         break;
     case MENU_COLOR:
         //display.drowTimeOnDispley(menu->getHour(), menu->getMinute());
-        display.drowColorPallete(menu->getSettings()->clockColor);        
+        display.drowColorPallete(displaySettings.clockColor);        
         break;
     case MENU_PLUS_COLOR:        
        // display.drowTemperatureOnDispley(35, icons::FADE_ALL);
-        display.drowColorPallete(menu->getSettings()->plusZeroColor);  
+        display.drowColorPallete(displaySettings.plusZeroColor);  
         break;
     case MENU_SUB_COLOR:        
         //display.drowTemperatureOnDispley(-35, icons::FADE_ALL);
-        display.drowColorPallete(menu->getSettings()->subZeroColor);
+        display.drowColorPallete(displaySettings.subZeroColor);
         break; 
-    case MENU_BRIGHTNESS:        
-        
+    case MENU_ICONS_COLOR:        
+        display.drowIcon(icons::ALL);
+        display.drowColorPallete(displaySettings.iconsColor);
+        break;
+    case MENU_BRIGHTNESS:   
         display.drowSettingsBtigthOnDispley();
+        break;
+    case MENU_PERIOD:        
+        display.drowVauleOnDispley(CHAR_DOWN_P, CHAR_DOWN_R, displaySettings.periodTemp);
+    case MENU_DURATION:        
+        display.drowVauleOnDispley(CHAR_DOWN_ZERO, CHAR_DOWN_ZERO, displaySettings.durationTemp);
         break;
     case MENU_SAVE:        
         //TODO "&"
@@ -172,18 +194,12 @@ void LedClockOn7Segments::attachShowIconLed(void (*func)(byte)){
     display.attachShowIconLed(func);
 }
 void LedClockOn7Segments::saveSettings(DisplaySettings diaplaySettings){
-    Settings settings(diaplaySettings.clockColor, diaplaySettings.subZeroColor, diaplaySettings.plusZeroColor, diaplaySettings.brightness);
-    settings.save();
+    diaplaySettings.save();    
 }
 
 DisplaySettings LedClockOn7Segments::loadSettings(){
-    Settings settings(55, 66, 77, 20);
-    settings.load();
     DisplaySettings loadedSettings;
-    loadedSettings.clockColor = settings.getClockColor();
-    loadedSettings.subZeroColor =settings.getSuZeroColor();
-    loadedSettings.plusZeroColor = settings.getPlusZeroColor();
-    loadedSettings.brightness = settings.getBrightness();
+    loadedSettings.load();
     return loadedSettings;
 }
 
@@ -213,6 +229,7 @@ bool LedClockOn7Segments::drowTemperatureIfCan(TemperatureSensorStats *tStats, s
         case MAX_T_MODE:
             display.drowTemperatureOnDispley(tStats->getMaxtemperature(), tStats->getIcon());
             display.drowIcon(MAX_T);
+            
             break;
         case MIN_T_MODE:
             display.drowTemperatureOnDispley(tStats->getMintemperature(), tStats->getIcon());
@@ -221,7 +238,6 @@ bool LedClockOn7Segments::drowTemperatureIfCan(TemperatureSensorStats *tStats, s
         default:
             break;
         }
-        
         
         return true;
     }else{
@@ -269,27 +285,39 @@ bool LedClockOn7Segments::checkStateAvailable(clockStates st){
 }
 
 void LedClockOn7Segments::switchModeButtonClick(){
+    starBtnLigthMilles = millis();
     if(menu != NULL){
         menu->setdColor(12);
         return;
     }
+    display.drowIcon(icons::STAT_BUTTON);
+    display.drowIcon(icons::SWITCH_BUTTON);
     while(!checkStateAvailable(changeNextAvailable()));
 }
 
 void LedClockOn7Segments::statsButtonClick(){
+    /*Serial.print("pT=");
+    Serial.println(displaySettings.periodTemp);
+    Serial.print("D=");
+    Serial.println(displaySettings.durationTemp);
+    Serial.print("sMil=");
+    Serial.println(stateStartMilles);
+    Serial.print("wPer=");
+    Serial.println(workPeriodInSeconds);*/
+    starBtnLigthMilles = millis();
     if(menu != NULL){
         menu->setdColor(1);
         return;
     }else{
+        display.drowIcon(icons::STAT_BUTTON);
+        display.drowIcon(icons::SWITCH_BUTTON);
         if(getClockState() == CUR_T_OUTDOOR){
             changeNextStstMode();
         }
         if(getClockState() == CUR_T_INDOOR){
             changeNextStstMode();
         }
-
     }
-    //TODO:
 }
 
 void LedClockOn7Segments::menuButtonClick(){    
@@ -317,9 +345,6 @@ void LedClockOn7Segments::exitFromMenu(){
 }
 
 void LedClockOn7Segments::menuNextButtonClick(){
-#ifdef DEBAG
-    Serial.println("Next Menu");
-#endif
     if(menu != NULL){
         menuStates nextMenu = menu->nextMenu();
         if(nextMenu != MENU_SAVE){
@@ -352,9 +377,7 @@ void LedClockOn7Segments::menuMinusButtonClick(){
     if(menu != NULL){
         changeStateTo(MENU, 30);
         menu->decreaseValue();  
-        display.cronCounter = 0; 
-        //display.setSettings(menu->getSettings());
-        //custormColor =  menu->getCurrentColor();//TODO дублируемый код
+        display.cronCounter = 0;         
         drowCurentStateOnValueChanging();
         display.render();     
     }
@@ -413,10 +436,24 @@ void LedClockOn7Segments::changeStateTo(clockStates st, byte worckDuration){
 
 
 clockStates LedClockOn7Segments::getClockState(){   
-    if(millis() < stateStartMilles + workPeriodInSeconds*1000){
+    if(state == CUR_TIME){
+        if(millis() >= stateStartMilles + displaySettings.periodTemp*1000U){
+            if(outdoorStats != NULL && outdoorStats->canBeShowed(curentDateTimeInMinutes)){
+                
+                changeStateTo(CUR_T_OUTDOOR, displaySettings.durationTemp);
+                return state;
+            }else{
+                // changeStateTo(CUR_TIME, 60);
+            }
+        }
+    }
+    
+    if(millis() < (stateStartMilles + workPeriodInSeconds*1000U)){
         return state;
     }else{
-        changeStateTo(CUR_TIME);
+        
+        changeStateTo(CUR_TIME, 60);
+        
         return state;
     }
 }

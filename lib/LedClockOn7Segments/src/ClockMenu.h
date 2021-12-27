@@ -22,6 +22,10 @@ private:
     void increaseColor(int8_t &color);
     void decreaseBrightness();
     void increaseBrightness();
+    void decreasePeriodTemp();
+    void increasePeriodTemp();
+    void decreaseDurationTemp();
+    void increaseDurationTemp();
 
 public:
     
@@ -40,11 +44,7 @@ public:
     }    
     void setdColor(byte delta = 1){
         dColor = delta;
-    }
-  //  CHSV getCurrentColor();
-    DisplaySettings* getSettings(){
-        return settings;
-    }
+    }  
 };
 
 

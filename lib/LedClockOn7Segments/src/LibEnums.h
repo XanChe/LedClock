@@ -20,6 +20,9 @@ enum menuStates {
     MENU_COLOR,
     MENU_SUB_COLOR,
     MENU_PLUS_COLOR,
+    MENU_ICONS_COLOR,
+    MENU_PERIOD,
+    MENU_DURATION,
     MENU_BRIGHTNESS,
     MENU_SAVE,
 };

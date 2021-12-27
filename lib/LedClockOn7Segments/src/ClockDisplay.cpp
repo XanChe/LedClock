@@ -73,17 +73,20 @@ void ClockDisplay::drowLedSegment(LedPixel ledArray[], byte start, byte count, b
     }
 }
 
-void ClockDisplay::drowSettingsBtigthOnDispley(){
+void ClockDisplay::drowSettingsBtigthOnDispley(){   
+    drowVauleOnDispley(CHAR_UP_ZERO, CHAR_DOWN_ZERO, (int)((settings.brightness / 255.0) * 100) - 1);
+}
+
+void ClockDisplay::drowVauleOnDispley(byte char1, byte char2, byte value){
     clearDispley();
-    
-    char templ = (int)((settings.brightness / 255.0) * 100) / 10;
-    char tempr = (int)((settings.brightness / 255.0) * 100) % 10; 
-    drowNumber(0, CHAR_UP_ZERO);    
-    drowNumber(SEGMENT_LED_COUNT*7, CHAR_DOWN_ZERO, DAYLY);
+    Serial.println(value);
+    char templ = value / 10;
+    char tempr = value % 10; 
+    drowNumber(0, char1);    
+    drowNumber(SEGMENT_LED_COUNT*7, char2, DAYLY);
     drowDotes(OFF) ;
     drowNumber(SEGMENT_LED_COUNT*7*2+DOTES_LED_COUNT, tempr);
-    drowNumber(SEGMENT_LED_COUNT*7*3+DOTES_LED_COUNT, templ);   
-        
+    drowNumber(SEGMENT_LED_COUNT*7*3+DOTES_LED_COUNT, templ); 
 }
 
 void ClockDisplay::drowTemperatureOnDispley(int temperature, icons ic){    
@@ -207,7 +210,7 @@ byte ClockDisplay::applyPixelEffect(LedPixel ledPixel){
         }
         break;
     case CUSTOM_COLOR:
-            return ledPixel.isShowed ? settings.custormColor : 0;
+            return ledPixel.isShowed ? settings.iconsColor : 0;
         break;
     default:
         return ledPixel.color;
@@ -219,25 +222,25 @@ void ClockDisplay::drowIcon(icons icon){
     switch (icon)
     {
     case icons::INDOOR_T:
-        drowLedSegment(ledIcons, 6 , 4, COLOR_ICONS, DAYLY);        
+        drowLedSegment(ledIcons, 6 , 4, settings.iconsColor, DAYLY);        
         break;
     case icons::OUTDOOR_T:
-        drowLedSegment(ledIcons, 10 , 4, COLOR_ICONS, DAYLY);
+        drowLedSegment(ledIcons, 10 , 4, settings.iconsColor, DAYLY);
         break;
     case icons::MAX_T:
-        drowLedSegment(ledIcons, 4 , 1, COLOR_ICONS, DAYLY);
+        drowLedSegment(ledIcons, 4 , 1, settings.iconsColor, DAYLY);
         break;
     case icons::MIN_T:
-        drowLedSegment(ledIcons, 5 , 1, COLOR_ICONS, DAYLY);
+        drowLedSegment(ledIcons, 5 , 1, settings.iconsColor, DAYLY);
         break;
     case icons::SWITCH_BUTTON:
-        drowLedSegment(ledIcons, 2 , 2, COLOR_ICONS, DAYLY);
+        drowLedSegment(ledIcons, 2 , 2, settings.iconsColor, DAYLY);
         break;
     case icons::STAT_BUTTON:
-        drowLedSegment(ledIcons, 0 , 2, COLOR_ICONS, DAYLY);
+        drowLedSegment(ledIcons, 0 , 2, settings.iconsColor, DAYLY);
         break;
     case icons::ALL:
-        drowLedSegment(ledIcons, 0 , 14, COLOR_ICONS, NIGHTLY);
+        drowLedSegment(ledIcons, 0 , 14, settings.iconsColor, NIGHTLY);
         break;
     case icons::FADE_ALL:
         drowLedSegment(ledIcons, 0 , 14, COLOR_BLACK, OFF);
