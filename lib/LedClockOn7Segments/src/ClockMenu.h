@@ -18,10 +18,12 @@ private:
     void increaseHour();
     void decreaseMinute();
     void increaseMinute();
-    void decreaseColor(int8_t &color);
-    void increaseColor(int8_t &color);
+    void decreaseColor(byte &color);
+    void increaseColor(byte &color);
     void decreaseBrightness();
     void increaseBrightness();
+    void decreaseBrightCorrector();
+    void increaseBrightCorrectors();
     void decreasePeriodTemp();
     void increasePeriodTemp();
     void decreaseDurationTemp();

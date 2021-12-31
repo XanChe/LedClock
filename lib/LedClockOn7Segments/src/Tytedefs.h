@@ -3,30 +3,24 @@
 #include <LibEnums.h>
 #include <EEPROM.h>
 struct DisplaySettings{
-    int8_t brightness = 60;
-    int8_t brghtCorrector = 50;
-    int8_t subZeroColor = 0;       // цвет отрисовки температуры 
-    int8_t plusZeroColor = 20;    // цвет отрисовки температуры
-    int8_t clockColor = 150;        // цвет отрисовки времени 
-    int8_t iconsColor = 43;
-    int8_t periodTemp = 60;
-    int8_t durationTemp = 15;
-    DisplaySettings operator=(DisplaySettings const &other){
-        brightness = other.brightness;
-        subZeroColor = other.subZeroColor;
-        plusZeroColor = other.plusZeroColor;
-        clockColor = other.clockColor;
-        iconsColor = other.iconsColor;
-        periodTemp = other.periodTemp;
-        return *this;
-    }
+    byte brightness = 65;
+    byte brghtCorrector = 50;
+    byte subZeroColor = 0;       // цвет отрисовки температуры 
+    byte plusZeroColor = 20;    // цвет отрисовки температуры
+    byte clockColor = 150;        // цвет отрисовки времени 
+    byte iconsColor = 43;
+    byte periodTemp = 60;
+    byte durationTemp = 15;
+    
+    
     int8_t getBrightness(){
         if(brightness < 60) brightness = 60;
         return brightness;
     }
     void save(){
         EEPROMWriteInt(0,27575);
-        EEPROMWriteInt(2,clockColor);
+        EEPROM.write(2,clockColor);
+        EEPROM.write(3, brghtCorrector);
         EEPROM.write(4,subZeroColor);
         EEPROM.write(5, iconsColor);
         EEPROM.write(6,plusZeroColor);
@@ -37,7 +31,8 @@ struct DisplaySettings{
     }
     void load(){
         if(EEPROMReadInt(0) == 27575){
-            this->clockColor =  EEPROMReadInt(2);
+            this->clockColor =  EEPROM.read(2);
+            this->brghtCorrector = EEPROM.read(3);
             this->subZeroColor = EEPROM.read(4);
             this->iconsColor = EEPROM.read(5);
             this->plusZeroColor = EEPROM.read(6);

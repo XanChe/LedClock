@@ -124,7 +124,7 @@ public:
     void drowTemperatureOnDispley(int t, icons ic);    
     void drowIcon(icons icon);
     void drowVauleOnDispley(byte char1, byte char2, byte value); 
-    void drowSettingsBtigthOnDispley();    
+    void drowSettingsBrigthOnDispley();
     void drowColorPallete(int8_t color);
     void clear();
     void periodicalRender(byte brigth = 0);

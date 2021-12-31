@@ -91,7 +91,10 @@ void LedClockOn7Segments::drowMenuState(){
         display.drowColorPallete(displaySettings.iconsColor);
         break;
     case MENU_BRIGHTNESS:        
-        display.drowSettingsBtigthOnDispley();
+        display.drowSettingsBrigthOnDispley();
+        break;
+    case MENU_BRIGHT_CORRECTOR:   
+        display.drowVauleOnDispley(8, 8, displaySettings.brghtCorrector);
         break;
     case MENU_PERIOD:        
         display.drowVauleOnDispley(CHAR_DOWN_P, CHAR_DOWN_R, displaySettings.periodTemp);
@@ -134,7 +137,10 @@ void LedClockOn7Segments::drowCurentStateOnValueChanging(){
         display.drowColorPallete(displaySettings.iconsColor);
         break;
     case MENU_BRIGHTNESS:   
-        display.drowSettingsBtigthOnDispley();
+        display.drowSettingsBrigthOnDispley();
+        break;
+    case MENU_BRIGHT_CORRECTOR:   
+        display.drowVauleOnDispley(8, 8, displaySettings.brghtCorrector);
         break;
     case MENU_PERIOD:        
         display.drowVauleOnDispley(CHAR_DOWN_P, CHAR_DOWN_R, displaySettings.periodTemp);

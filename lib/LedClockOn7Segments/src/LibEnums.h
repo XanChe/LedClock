@@ -24,6 +24,7 @@ enum menuStates {
     MENU_PERIOD,
     MENU_DURATION,
     MENU_BRIGHTNESS,
+    MENU_BRIGHT_CORRECTOR,
     MENU_SAVE,
 };
 

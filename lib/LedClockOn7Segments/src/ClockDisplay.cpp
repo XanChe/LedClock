@@ -75,17 +75,17 @@ void ClockDisplay::drowLedSegment(LedPixel ledArray[], byte start, byte count, b
     }
 }
 
-void ClockDisplay::drowSettingsBtigthOnDispley(){   
-    drowVauleOnDispley(CHAR_UP_ZERO, CHAR_DOWN_ZERO, (int)((settings.brightness / 255.0) * 100) - 1);
+void ClockDisplay::drowSettingsBrigthOnDispley(){   
+    drowVauleOnDispley(CHAR_UP_ZERO, CHAR_DOWN_ZERO, (int)((settings.brightness / 255.0) * 100));
 }
 
 void ClockDisplay::drowVauleOnDispley(byte char1, byte char2, byte value){
     clearDispley();
-    Serial.println(value);
-    char templ = value / 10;
-    char tempr = value % 10; 
+    //Serial.println(value);
+    byte templ = value / 10;
+    byte tempr = value % 10; 
     drowNumber(0, char1);    
-    drowNumber(SEGMENT_LED_COUNT*7, char2, DAYLY);
+    drowNumber(SEGMENT_LED_COUNT*7, char2, DAYLY_CORRECT);
     drowDotes(OFF) ;
     drowNumber(SEGMENT_LED_COUNT*7*2+DOTES_LED_COUNT, tempr);
     drowNumber(SEGMENT_LED_COUNT*7*3+DOTES_LED_COUNT, templ); 

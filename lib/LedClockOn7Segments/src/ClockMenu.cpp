@@ -28,6 +28,9 @@ menuStates ClockMenu::nextMenu(){
         menuState = MENU_BRIGHTNESS;
         break;
     case MENU_BRIGHTNESS:
+        menuState = MENU_BRIGHT_CORRECTOR;
+        break;
+    case MENU_BRIGHT_CORRECTOR:
         menuState = MENU_PERIOD;
         break;
     case MENU_PERIOD:
@@ -74,6 +77,9 @@ void ClockMenu::increseValue(){
     case MENU_BRIGHTNESS:
         increaseBrightness();
         break;
+    case MENU_BRIGHT_CORRECTOR:
+        increaseBrightCorrectors();
+        break;
     case MENU_PERIOD:
         increasePeriodTemp();
         break;
@@ -110,6 +116,9 @@ void ClockMenu::decreaseValue(){
     case MENU_BRIGHTNESS:
         decreaseBrightness();
         break;
+    case MENU_BRIGHT_CORRECTOR:
+        decreaseBrightCorrector();
+        break;
     case MENU_PERIOD:
         decreasePeriodTemp();
         break;
@@ -141,25 +150,30 @@ void ClockMenu::decreaseMinute(){
 void ClockMenu::increaseMinute(){
     if(++minute > 59) minute = 0;
 }
-void ClockMenu::decreaseColor(int8_t &color){    
+void ClockMenu::decreaseColor(byte &color){    
     int tColor = color - dColor;
     if(tColor < 0) tColor += 255; 
     color = tColor % 255;    
 }
-void ClockMenu::increaseColor(int8_t &color){    
+void ClockMenu::increaseColor(byte &color){    
     int tColor = color + dColor;
     color = tColor % 255;
 }
 void ClockMenu::decreaseBrightness(){
-    Serial.print("Br-=");
     if(--settings->brightness < 60) settings->brightness = 60;
-    Serial.println(settings->brightness);
 }
 void ClockMenu::increaseBrightness(){
-    Serial.print("Br+=");
-    
-    if(settings->brightness + 1 <= 255) ++(settings->brightness);
-    Serial.println(settings->brightness);
+    if(settings->brightness + 1 <= 254) ++(settings->brightness);
+}
+void ClockMenu::decreaseBrightCorrector(){
+    if(settings->brghtCorrector - 1 < 0) {
+        settings->brghtCorrector = 0;
+    }else{
+        --settings->brghtCorrector;
+    }
+}
+void ClockMenu::increaseBrightCorrectors(){
+    if(settings->brghtCorrector + 1 < 100) ++(settings->brghtCorrector);
 }
 
 void ClockMenu::decreasePeriodTemp(){

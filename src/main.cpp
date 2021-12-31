@@ -30,14 +30,12 @@ MicroDS3231 rtc;
 EncButton<EB_TICK, CLK, DT, SW> enc1;
 EncButton<EB_TICK, A2> btnShowStats;
 EncButton<EB_TICK, A3> btnSwitchMode;
-//Encoder enc1(CLK, DT, SW); 
+
 RH_NRF905 nrf905;
 MicroDS18B20<A0> sensor;
 
 microLED<NUM_LEDS, DATA_PIN, MLED_NO_CLOCK, LED_WS2818, ORDER_GRB, CLI_AVER, SAVE_MILLIS> stripMain;
 microLED<NUM_ICON_LEDS, DATA_ICON_PIN, MLED_NO_CLOCK, LED_WS2818, ORDER_GRB, CLI_AVER, SAVE_MILLIS> stripIcons;
-/*CRGBArray<NUM_LEDS> leds;
-CRGBArray<NUM_ICON_LEDS> ledIcons;*/
 
 void configurateFastLED();
 void configurateLedClock();
@@ -81,7 +79,6 @@ void setup() {
         EEPROM.write(60 + i * 2 + 1, 248);
         
     }*/
-    delay(1000);
 }
 //------------------
 void loop() {
@@ -175,6 +172,7 @@ void setCustomIconLed(byte index, byte color, byte brigth){
     stripIcons.set(index, mWheel8(color, brigth));
 }
 void showMainStrip(byte bright){ 
+    
     stripMain.setBrightness(bright);   
     stripMain.show();
 }
