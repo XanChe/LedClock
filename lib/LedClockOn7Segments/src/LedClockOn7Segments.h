@@ -40,7 +40,7 @@ private:
     clockStates state = CUR_TIME; // текущее состояние часов
     statMode temperatureMode = CURRENT_T_MODE;
     unsigned long stateStartMilles = 0; // когда часы перешли в тек. состояние
-    unsigned long starBtnLigthMilles = 0;
+    
     int workPeriodInSeconds = 15; // сколько положено работать в тек. состоянии
 
        
@@ -62,9 +62,7 @@ private:
     bool drowTemperatureIfCan(TemperatureSensorStats *tStats, statMode mode = CURRENT_T_MODE);
     
     bool isMenuMode();
-    bool isButtunLightOn(){
-        return millis() < starBtnLigthMilles + 10000;
-    }
+    
 
     void drowMenuState();
     void drowClockState();

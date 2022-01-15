@@ -1,5 +1,5 @@
 #define FASTLED_ALLOW_INTERRUPTS 0
-//#define DEBAG
+#define DEBAG
 #ifdef DEBAG 
 #define logg(x) Serial.println(x)
 #else
@@ -12,11 +12,9 @@
 #include "microDS18B20.h" // для работы с датчиком температуры на борту
 #include <SPI.h>
 #include "RH_NRF905.h" // для работы с радио модулем
-//#include "GyverEncoder.h" 
+
 #include "microDS3231.h"// для работы с модулем реального времени
 #include <EncButton.h>
-
-#define COLOR_DEBTH 2
 
 #include <microLED.h> 
 
@@ -182,6 +180,7 @@ void showIconStrip(byte bright){
 }
 
 void updateTime(){  
+    
     ledClock.setCurTime((byte)rtc.getDay(), (byte)rtc.getHours(), (byte)rtc.getMinutes(), (byte)rtc.getSeconds());
 }
 

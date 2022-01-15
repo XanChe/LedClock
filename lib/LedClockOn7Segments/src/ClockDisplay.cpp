@@ -105,7 +105,9 @@ void ClockDisplay::drowTemperatureOnDispley(int temperature, icons ic){
     drowNumber(SEGMENT_LED_COUNT*7*2+DOTES_LED_COUNT, tempr, effect);
     drowNumber(SEGMENT_LED_COUNT*7*3+DOTES_LED_COUNT, templ, effect);   
     if(temperature<0)drowSign();   
-    drowIcon(ic);      
+    if(isButtunLightOn()){
+        drowIcon(ic, effect);      
+    }
 }
 
 void ClockDisplay::drowSign(){
@@ -229,26 +231,26 @@ void ClockDisplay::applyPixelEffect(byte index, LedPixel ledPixel,void (*func)(b
     }    
 }
 
-void ClockDisplay::drowIcon(icons icon){    
+void ClockDisplay::drowIcon(icons icon, showingLedEffects effect){    
     switch (icon)
     {
     case icons::INDOOR_T:
-        drowLedSegment(ledIcons, 6 , 4, settings.iconsColor, DAYLY);        
+        drowLedSegment(ledIcons, 6 , 4, settings.iconsColor, effect);        
         break;
     case icons::OUTDOOR_T:
-        drowLedSegment(ledIcons, 10 , 4, settings.iconsColor, DAYLY);
+        drowLedSegment(ledIcons, 10 , 4, settings.iconsColor, effect);
         break;
     case icons::MAX_T:
-        drowLedSegment(ledIcons, 4 , 1, settings.iconsColor, DAYLY);
+        drowLedSegment(ledIcons, 4 , 1, settings.iconsColor, effect);
         break;
     case icons::MIN_T:
-        drowLedSegment(ledIcons, 5 , 1, settings.iconsColor, DAYLY);
+        drowLedSegment(ledIcons, 5 , 1, settings.iconsColor, effect);
         break;
     case icons::SWITCH_BUTTON:
-        drowLedSegment(ledIcons, 2 , 2, settings.iconsColor, DAYLY);
+        drowLedSegment(ledIcons, 2 , 2, settings.iconsColor, effect);
         break;
     case icons::STAT_BUTTON:
-        drowLedSegment(ledIcons, 0 , 2, settings.iconsColor, DAYLY);
+        drowLedSegment(ledIcons, 0 , 2, settings.iconsColor, effect);
         break;
     case icons::ALL:
         drowLedSegment(ledIcons, 0 , 14, settings.iconsColor, NIGHTLY);

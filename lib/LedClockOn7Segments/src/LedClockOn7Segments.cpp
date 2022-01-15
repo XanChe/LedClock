@@ -55,7 +55,7 @@ void LedClockOn7Segments::drowClockState(){
             display.drowTimeOnDispley(curentHour, curentMinute);
             break;
         }
-    if(isButtunLightOn()){
+    if(display.isButtunLightOn()){
         display.drowIcon(STAT_BUTTON);
         display.drowIcon(SWITCH_BUTTON);
     }
@@ -291,7 +291,7 @@ bool LedClockOn7Segments::checkStateAvailable(clockStates st){
 }
 
 void LedClockOn7Segments::switchModeButtonClick(){
-    starBtnLigthMilles = millis();
+    display.startIconLight();
     if(menu != NULL){
         menu->setdColor(12);
         return;
@@ -302,15 +302,8 @@ void LedClockOn7Segments::switchModeButtonClick(){
 }
 
 void LedClockOn7Segments::statsButtonClick(){
-    /*Serial.print("pT=");
-    Serial.println(displaySettings.periodTemp);
-    Serial.print("D=");
-    Serial.println(displaySettings.durationTemp);
-    Serial.print("sMil=");
-    Serial.println(stateStartMilles);
-    Serial.print("wPer=");
-    Serial.println(workPeriodInSeconds);*/
-    starBtnLigthMilles = millis();
+    
+    display.startIconLight();
     if(menu != NULL){
         menu->setdColor(1);
         return;

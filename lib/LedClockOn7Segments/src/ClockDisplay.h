@@ -63,7 +63,8 @@ private:
      // тоже самае для иконок   
     
     DisplaySettings settings;
-     
+    
+    unsigned long starBtnLigthMilles = 0;
    // CustomLED CurFastLED;
     void (*setLedColor)(byte index, byte color, byte brigth);
     void (*setLedIconColor)(byte index, byte color, byte brigth);
@@ -109,10 +110,13 @@ public:
     void attachSetLedIconColor(void (*func)(byte, byte, byte));
     void attachShowMainLed(void (*func)(byte));
     void attachShowIconLed(void (*func)(byte));
-   /*
-    void attachFastLED(CustomLED &fLED);
-    void attachMainLedsArray(LedData lesArray[]);
-    void attachIconLedsArray(LedData lesArray[]);*/
+   
+    bool isButtunLightOn(){
+        return millis() < starBtnLigthMilles + 10000;
+    }
+    void startIconLight(){
+        starBtnLigthMilles = millis();
+    }
     /**
      * Комплексная отрисовка для каждого из режимов
      * */
@@ -122,7 +126,7 @@ public:
     void drowMenuTimeOnDispley(byte hour, byte minutes, menuStates st);
      // рисуем иконки 
     void drowTemperatureOnDispley(int t, icons ic);    
-    void drowIcon(icons icon);
+    void drowIcon(icons icon, showingLedEffects effect = DAYLY);
     void drowVauleOnDispley(byte char1, byte char2, byte value); 
     void drowSettingsBrigthOnDispley();
     void drowColorPallete(int8_t color);
